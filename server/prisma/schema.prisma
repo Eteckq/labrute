@@ -23,12 +23,12 @@ enum Lang {
 }
 
 model User {
-  id              String           @id @unique @db.Uuid
+  id              String           @id @unique @db.VarChar(255)
   lang            Lang             @default(fr)
   name            String           @db.VarChar(255)
   admin           Boolean          @default(false)
   moderator       Boolean          @default(false)
-  connexionToken  String           @db.Uuid
+  connexionToken  String           @db.VarChar(255)
   bruteLimit      Int              @default(3)
   gold            Int              @default(0)
   fightSpeed      Int              @default(1)
@@ -197,7 +197,7 @@ model Brute {
   ranking                      Int                     @default(11)
   gender                       Gender
   user                         User?                   @relation(fields: [userId], references: [id])
-  userId                       String?                 @db.Uuid
+  userId                       String?                 @db.VarChar(255)
   body                         BruteBody?
   colors                       BruteColors?
   weapons                      WeaponName[]            @default([])
@@ -356,7 +356,7 @@ model TournamentGold {
   id     Int      @id @default(autoincrement())
   date   DateTime @db.Date
   user   User     @relation(fields: [userId], references: [id])
-  userId String   @db.Uuid
+  userId String   @db.VarChar(255)
   gold   Int
 }
 
@@ -492,7 +492,7 @@ model Achievement {
   brute   Brute?          @relation(fields: [bruteId], references: [id])
   bruteId Int?
   user    User?           @relation(fields: [userId], references: [id])
-  userId  String?         @db.Uuid
+  userId  String?         @db.VarChar(255)
   @@unique([name, bruteId])
 }
 
