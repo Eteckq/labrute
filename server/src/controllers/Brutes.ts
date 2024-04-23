@@ -220,7 +220,6 @@ const Brutes = {
       }
 
       let goldLost = 0;
-      let newLimit = user.bruteLimit;
       // Refuse if user has too many brutes and not enough gold
       if (user.brutes.length >= user.bruteLimit) {
         const gold = getGoldNeededForNewBrute(user);
@@ -232,12 +231,11 @@ const Brutes = {
             where: { id: user.id },
             data: {
               gold: { decrement: gold },
-              bruteLimit: { increment: 1 },
+              bruteLimit: { set: 1 },
             },
             select: { id: true },
           });
           goldLost = gold;
-          newLimit += 1;
         }
       }
 
@@ -310,7 +308,7 @@ const Brutes = {
       // Update achievements
       await checkLevelUpAchievements(prisma, brute, destinyChoice);
 
-      res.send({ brute, goldLost, newLimit });
+      res.send({ brute, goldLost, newLimit: 1 });
     } catch (error) {
       sendError(res, error);
     }
@@ -439,10 +437,6 @@ const Brutes = {
 
       if (!freshBrute) {
         throw new Error(translate('bruteNotFound', user));
-      }
-
-      if (freshBrute.xp !== brute.xp) {
-        throw new ExpectedError(translate('slowDown', user));
       }
 
       // Update brute
