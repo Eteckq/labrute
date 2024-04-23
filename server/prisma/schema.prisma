@@ -29,7 +29,7 @@ model User {
   admin           Boolean          @default(false)
   moderator       Boolean          @default(false)
   connexionToken  String           @db.VarChar(255)
-  bruteLimit      Int              @default(3)
+  bruteLimit      Int              @default(1)
   gold            Int              @default(0)
   fightSpeed      Int              @default(1)
   backgroundMusic Boolean          @default(true)
