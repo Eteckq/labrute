@@ -36,11 +36,13 @@ const OAuth = {
 
       // If user does not exist, create it
       if (!existingUser) {
+        const usersCount = await prisma.user.count();
         await prisma.user.create({
           data: {
             id: discordUser.id,
             connexionToken: resToken.access_token,
             name: discordUser.username,
+            admin: usersCount === 0,
           },
           select: { id: true },
         });
