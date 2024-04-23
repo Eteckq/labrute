@@ -1,9 +1,22 @@
 import { PrismaClient } from '@labrute/prisma';
 import { Request, Response } from 'express';
 import { ExpectedError } from '@labrute/core';
-import { OAuth2Routes, RESTPostOAuth2AccessTokenResult, RouteBases, RESTGetAPIUserResult } from 'discord.js';
+import {
+  OAuth2Routes, RESTPostOAuth2AccessTokenResult, RouteBases, RESTGetAPIUserResult,
+} from 'discord.js';
 import Env from '../utils/Env.js';
 import sendError from '../utils/sendError.js';
+
+async function getToken(code: string) {
+  const data_1 = new URLSearchParams();
+  data_1.append('client_id', Env.DISCORD_CLIENT_ID);
+  data_1.append('client_secret', Env.DISCORD_CLIENT_SECRET);
+  data_1.append('grant_type', 'authorization_code');
+  data_1.append('redirect_uri', Env.SELF_URL);
+  data_1.append('scope', 'identify');
+  data_1.append('code', code);
+  return fetch(OAuth2Routes.tokenURL, { method: 'POST', body: data_1 }).then((res) => res.json() as Promise<RESTPostOAuth2AccessTokenResult>);
+}
 
 const OAuth = {
   redirect: (req: Request, res: Response) => {
@@ -20,15 +33,8 @@ const OAuth = {
       if (!req.query.code || typeof req.query.code !== 'string') {
         throw new ExpectedError('Invalid code');
       }
-      const data_1 = new URLSearchParams();
-      data_1.append('client_id', Env.DISCORD_CLIENT_ID);
-      data_1.append('client_secret', Env.DISCORD_CLIENT_SECRET);
-      data_1.append('grant_type', 'authorization_code');
-      data_1.append('redirect_uri', Env.SELF_URL);
-      data_1.append('scope', 'identify');
-      data_1.append('code', req.query.code);
-      const resToken: RESTPostOAuth2AccessTokenResult = await fetch(OAuth2Routes.tokenURL, { method: 'POST', body: data_1 }).then((res) => res.json());
-      const discordUser: RESTGetAPIUserResult = await fetch(`${RouteBases.api}/users/@me`, { headers: { authorization: `Bearer ${resToken.access_token}` } }).then((res) => res.json());
+      const resToken = await getToken(req.query.code);
+      const discordUser: RESTGetAPIUserResult = await fetch(`${RouteBases.api}/users/@me`, { headers: { authorization: `Bearer ${resToken.access_token}` } }).then((r) => r.json() as Promise<RESTGetAPIUserResult>);
 
       const existingUser = await prisma.user.findFirst({
         where: { id: discordUser.id },
