@@ -47,8 +47,5 @@
       "./server"
     ]
   },
-  "dependencies": {
-    "@eternal-twin/cli": "^0.10.3"
-  },
   "packageManager": "yarn@4.0.2"
 }

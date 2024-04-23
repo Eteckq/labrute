@@ -24,8 +24,6 @@
     "seed": "node --loader ts-node/esm src/seed.ts"
   },
   "dependencies": {
-    "@eternal-twin/core": "^0.10.3",
-    "@eternal-twin/etwin-client-http": "^0.10.3",
     "@labrute/core": "workspace:*",
     "@labrute/prisma": "workspace:*",
     "@prisma/client": "^5.10.2",
