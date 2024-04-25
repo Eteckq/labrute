@@ -13,7 +13,7 @@
     "back": "cd ./server && yarn start:watch",
     "etwin": "etwin",
     "start": "cd ./server && yarn start",
-    "dev": "concurrently --prefix \"[{name}]\" --names \"DB,SERVER,CLIENT,ETWIN\" -c \"bgMagenta.bold,bgBlue.bold,bgGreen.bold,bgYellow.bold\" \"yarn run studio\" \"yarn run back\" \"yarn run front\" \"yarn run etwin\"",
+    "dev": "concurrently --prefix \"[{name}]\" --names \"DB,SERVER,CLIENT\" -c \"bgMagenta.bold,bgBlue.bold,bgGreen.bold,bgYellow.bold\" \"yarn run studio\" \"yarn run back\" \"yarn run front\"",
     "build": "yarn compile && yarn build:client",
     "build:client": "cd ./client && yarn build",
     "db:migrate:manual": "cd ./server && yarn db:migrate:manual",

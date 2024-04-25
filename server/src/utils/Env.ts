@@ -10,6 +10,7 @@ const Env = {
   DISCORD_WEBHOOK_TOKEN: process.env.DISCORD_WEBHOOK_TOKEN,
   DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID || '',
   DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET || '',
+  DISCORD_BOT_SECRET: process.env.DISCORD_BOT_SECRET || '',
   MAIL_HOST: process.env.MAIL_HOST || '',
   MAIL_PORT: process.env.MAIL_PORT || '465',
   MAIL_SECURE: process.env.MAIL_SECURE || '',
