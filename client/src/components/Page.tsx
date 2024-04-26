@@ -1,8 +1,7 @@
-import { getFightsLeft, getGoldNeededForNewBrute, Version } from '@labrute/core';
-import { AccountCircle, Add, AdminPanelSettings, DoNotDisturb, Login, Logout, MilitaryTech, MoreHoriz } from '@mui/icons-material';
-import { AlertTitle, Badge, Box, BoxProps, CircularProgress, Fab, Link, Alert as MuiAlert, SpeedDial, SpeedDialAction, Tooltip } from '@mui/material';
-import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
-import { isMobile } from 'react-device-detect';
+import { Version } from '@labrute/core';
+import { AdminPanelSettings, Login } from '@mui/icons-material';
+import { AlertTitle, Box, BoxProps, CircularProgress, Fab, Link, Alert as MuiAlert, Tooltip } from '@mui/material';
+import React, { useCallback, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -10,14 +9,12 @@ import { useAlert } from '../hooks/useAlert';
 import { useAuth } from '../hooks/useAuth';
 import { useLanguage } from '../hooks/useLanguage';
 import useStateAsync from '../hooks/useStateAsync';
-import ads, { AdName } from '../utils/ads';
 import catchError from '../utils/catchError';
 import Fetch from '../utils/Fetch';
 import Server from '../utils/Server';
 import Header from './Header';
 import Text from './Text';
 import { Lang } from '@labrute/prisma';
-import BruteRender from './Brute/Body/BruteRender';
 
 interface Props extends BoxProps {
   title: string,
@@ -37,18 +34,12 @@ const Page = ({
 }: Props) => {
   const { t } = useTranslation();
   const Alert = useAlert();
-  const { authing, user, signout, signin, updateData } = useAuth();
+  const { authing, user, signin, updateData } = useAuth();
   const navigate = useNavigate();
   const { language, setLanguage } = useLanguage();
 
   // Check if server is ready
   const { data: serverState } = useStateAsync(null, Server.isReady, undefined);
-
-  // Speed dial state
-  const [open, setOpen] = useState(false);
-
-  // Gold needed for a new brute
-  const goldNeeded = useMemo(() => (user ? getGoldNeededForNewBrute(user) : 0), [user]);
 
   // Auth on page load
   useEffect(() => {
@@ -66,36 +57,11 @@ const Page = ({
     }
   }, [checkServer, navigate, serverState]);
 
-  // Open speed dial
-  const openSpeedDial = useCallback(() => {
-    // Don't do anything on mobile
-    if (isMobile) return;
-
-    setOpen(true);
-  }, []);
-
-  // Close speed dial
-  const toggleSpeedDial = useCallback(() => {
-    setOpen((prev) => !prev);
-  }, []);
-
-  const goToCell = useCallback((name: string) => () => {
-    setOpen(false);
-    navigate(`/${name}/cell`);
-  }, [navigate]);
-
   const oauth = useCallback(() => {
     Fetch<{ url: string }>('/api/oauth/redirect').then(({ url }) => {
       window.location.href = url;
     }).catch(catchError(Alert));
   }, [Alert]);
-
-  // Logout
-  const logout = useCallback(() => {
-    setOpen(false);
-    signout();
-    Alert.open('success', t('logoutSuccess'));
-  }, [Alert, signout, t]);
 
   // Change language
   const changeLanguage = useCallback((lang: Lang) => () => {
@@ -112,24 +78,6 @@ const Page = ({
     }
   }, [Alert, setLanguage, updateData, user]);
 
-  // Redirect to Home page
-  const goHome = useCallback(() => {
-    setOpen(false);
-    navigate('/');
-  }, [navigate]);
-
-  // Redirect to Achievements page
-  const goToAchievements = useCallback(() => {
-    setOpen(false);
-    navigate('/achievements');
-  }, [navigate]);
-
-  // Redirect to Hall page
-  const goToHall = useCallback(() => {
-    setOpen(false);
-    navigate('/hall');
-  }, [navigate]);
-
   return (
     <Box
       sx={{
@@ -145,7 +93,7 @@ const Page = ({
       <Header url={headerUrl} />
       {children}
       {/* AUTH */}
-      {!user ? (
+      {!user && (
         <Tooltip title={t('login')}>
           <Fab
             onClick={oauth}
@@ -163,92 +111,9 @@ const Page = ({
               : <Login />}
           </Fab>
         </Tooltip>
-      ) : (
-        <SpeedDial
-          ariaLabel={t('account')}
-          open={open}
-          onMouseEnter={openSpeedDial}
-          onClick={toggleSpeedDial}
-          sx={{ position: 'fixed', bottom: 16, right: 16, zIndex: 101 }}
-          FabProps={{ sx: { bgcolor: 'success.light', '&:hover': { bgcolor: 'success.main' } } }}
-          icon={(
-            <Tooltip title={user.name}>
-              <AccountCircle />
-            </Tooltip>
-          )}
-        >
-          <SpeedDialAction
-            icon={<Logout color="error" />}
-            tooltipTitle={t('logout')}
-            tooltipOpen
-            onClick={logout}
-          />
-          <SpeedDialAction
-            icon={user.gold}
-            tooltipTitle={t('gold')}
-            tooltipOpen
-          />
-          <SpeedDialAction
-            icon={<MilitaryTech color="warning" />}
-            tooltipTitle={t('achievements')}
-            tooltipOpen
-            onClick={goToAchievements}
-          />
-          {user.brutes.slice(0, 3).map((brute) => (
-            <SpeedDialAction
-              key={brute.name}
-              icon={(
-                <Badge badgeContent={getFightsLeft(brute)} color="secondary">
-                  <Box sx={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: '50%',
-                    overflow: 'hidden',
-                    p: 0.25,
-                  }}
-                  >
-                    <BruteRender
-                      brute={brute}
-                      looking="left"
-                    />
-                  </Box>
-                </Badge>
-              )}
-              tooltipTitle={brute.name}
-              tooltipOpen
-              onClick={goToCell(brute.name)}
-            />
-          ))}
-          {user.brutes.length > 3 && (
-            <SpeedDialAction
-              icon={<MoreHoriz color="secondary" />}
-              tooltipTitle={t('hall')}
-              tooltipOpen
-              onClick={goToHall}
-            />
-          )}
-          <SpeedDialAction
-            icon={user.gold >= goldNeeded ? <Add color="success" /> : <DoNotDisturb color="error" />}
-            tooltipTitle={`${t('newBrute')}${getGoldNeededForNewBrute(user) > 0 ? ` (${getGoldNeededForNewBrute(user)} ${t('gold')})` : ''}`}
-            tooltipOpen
-            onClick={user.gold >= goldNeeded ? goHome : undefined}
-            sx={{ textAlign: 'right', whiteSpace: 'nowrap' }}
-          />
-        </SpeedDial>
       )}
       {/* FOOTER */}
       <Box sx={{ textAlign: 'center', mt: 2 }}>
-        <Text color="secondary" sx={{ fontWeight: 'bold' }}>
-          {t('moreGames')} :{' '}
-          {Object.entries(ads).map(([name, ad]) => (
-            <Fragment key={name}>
-              <Tooltip title={t(`${name as AdName}.desc`)}>
-                <Link href={ad.url} target="_blank">{t(name as AdName)}</Link>
-              </Tooltip>
-              {' '}
-            </Fragment>
-          ))}
-        </Text>
         <Text color="secondary" sx={{ fontWeight: 'bold' }}>
           &copy; 2008{' '}
           <Link href="http://www.motion-twin.com/">
@@ -284,17 +149,19 @@ const Page = ({
         </Text>
       </Box>
       <MuiAlert
-        severity="warning"
+        severity="info"
         variant="filled"
         sx={{ mb: 0 }}
       >
-        <AlertTitle>{t('betaTitle')}</AlertTitle>
-        {t('betaDescription')}
-        <Link underline="always" href="https://discord.gg/ERc3svy" target="_blank" sx={{ ml: 0.5 }}>
-          {t('discord')}
+        <AlertTitle>Fork LaBrute</AlertTitle>
+        Ce projet est un fork du projet
+        <Link underline="always" href="https://github.com/Zenoo/labrute" target="_blank" sx={{ ml: 0.5 }}>
+          https://github.com/Zenoo/labrute
         </Link>
-        .<br />
-        {t('betaReset')}
+        , afin de le rendre <span style={{ textDecoration: 'line-through' }}>accessible aux golems</span> jouable via Discord. Le code source est disponible ici
+        <Link underline="always" href="https://github.com/Eteckq/labrute/tree/discord" target="_blank" sx={{ ml: 0.5 }}>
+          https://github.com/Eteckq/labrute/tree/discord
+        </Link>
       </MuiAlert>
     </Box>
   );

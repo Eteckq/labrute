@@ -193,6 +193,10 @@ const HomeView = () => {
     }).catch(catchError(Alert));
   }, [Alert]);
 
+  if (user && user.brutes.length === 1) {
+    navigate(`/${user.brutes[0].name}/cell`);
+  }
+
   const character = (
     <Box sx={{
       mx: 'auto',
@@ -257,11 +261,22 @@ const HomeView = () => {
               />
             </Box>
             {/* NAME INPUT */}
+
             <Box sx={{ pl: 6.5, pr: 4 }}>
-              <StyledInput
-                onChange={changeName}
-                value={name}
-              />
+              {(user || authing) ? (
+                <StyledInput
+                  onChange={changeName}
+                  value={name}
+                />
+              ) : (
+                <FantasyButton
+                  color="success"
+                  onClick={login}
+                  sx={{ mt: 2 }}
+                >
+                  {t('connect')}
+                </FantasyButton>
+              )}
               {/* CHARACTER */}
               {character}
               {/* CUSTOMIZATION BUTTONS */}
@@ -305,24 +320,8 @@ const HomeView = () => {
               <Box sx={{ textAlign: 'center' }}>
                 <StyledButton onClick={createBrute}>{t('validate')}</StyledButton>
               </Box>
-              {(user || authing) ? (
-                // Visual noise
-                <Box
-                  component="img"
-                  src="/images/creation/scratches.png"
-                  alt="Scratch"
-                  sx={{ ml: 6 }}
-                />
-              ) : (
-                <FantasyButton
-                  color="success"
-                  onClick={login}
-                  sx={{ mt: 2 }}
-                >
-                  {t('connect')}
-                </FantasyButton>
-              )}
             </Box>
+
           </BoxBg>
           {/* RIGHT SIDE */}
           <BoxBg
