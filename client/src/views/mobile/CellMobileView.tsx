@@ -15,13 +15,11 @@ import Link from '../../components/Link';
 import Page from '../../components/Page';
 import Text from '../../components/Text';
 import { useBrute } from '../../hooks/useBrute';
-import { AdResult } from '../../utils/ads';
 import FantasyButton from '../../components/FantasyButton';
 import { History } from '@mui/icons-material';
 import moment from 'moment';
 
 export interface CellMobileViewProps {
-  ad: AdResult;
   logs: (Log & { currentBrute: { name: string } })[];
   language: Lang;
   ownsBrute: boolean;
@@ -31,7 +29,6 @@ export interface CellMobileViewProps {
 }
 
 const CellMobileView = ({
-  ad,
   logs,
   language,
   ownsBrute,
@@ -102,18 +99,8 @@ const CellMobileView = ({
         </Grid>
         <Grid item xs={12} sm={6} sx={{ textAlign: 'center' }} order={isXs ? 4 : 0}>
           {/* PETS OR ADVERT */}
-          {brute.pets.length > 0 ? (
+          {brute.pets.length > 0 && (
             <CellPets />
-          ) : (
-            <Tooltip title={t(`${ad.name}.desc`)}>
-              <Link to={ad.url} target="_blank" sx={{ width: 200, mx: 'auto' }}>
-                <Box
-                  component="img"
-                  src={`/images/redirects/${ad.illustration}`}
-                  sx={{ border: 2 }}
-                />
-              </Link>
-            </Tooltip>
           )}
         </Grid>
         <Grid item xs={12} sm={6} sx={{ textAlign: 'center' }} order={isXs ? 5 : 0}>

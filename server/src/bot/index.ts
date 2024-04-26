@@ -60,8 +60,12 @@ export default async (prisma: PrismaClient) => {
       },
     });
 
-    if (!user) await interaction.reply('You need an account');
-    else {
+    if (!user) {
+      await interaction.reply({
+        content: `Tu as besoin de créer une brute afin de pouvoir jouer. ${Env.SELF_URL}`,
+        ephemeral: true,
+      });
+    } else {
       const brute = await prisma.brute.findFirst({
         where: {
           user,
@@ -76,7 +80,7 @@ export default async (prisma: PrismaClient) => {
       });
       if (!brute) {
         await interaction.reply({
-          content: 'You need to create a brute first',
+          content: `Tu as besoin de créer une brute afin de pouvoir jouer. ${Env.SELF_URL}`,
           ephemeral: true,
         });
       } else if (interaction.commandName === 'fight') {
@@ -159,7 +163,9 @@ export default async (prisma: PrismaClient) => {
                     inline: true,
                   },
                   {
-                    name: `${targetBrute?.user ? targetBrute.user.name : 'BOT'}`,
+                    name: `${
+                      targetBrute?.user ? targetBrute.user.name : 'BOT'
+                    }`,
                     value: `${targetBrute?.name} - lv${targetBrute?.level}`,
                     inline: true,
                   },

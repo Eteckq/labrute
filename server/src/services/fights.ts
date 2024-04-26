@@ -1,4 +1,4 @@
-import { ExpectedError, getFightsLeft } from '@labrute/core';
+import { ExpectedError, LOSE_XP, WIN_XP, getFightsLeft } from '@labrute/core';
 import {
   PrismaClient, Prisma, User,
 } from '@labrute/prisma';
@@ -121,11 +121,11 @@ export async function doFight(
       ? levelDifference > 10
         ? 0
         : levelDifference > 2
-          ? 1
-          : 2
+          ? LOSE_XP
+          : WIN_XP
       : levelDifference > 10
         ? 0
-        : 1
+        : LOSE_XP
     : 0;
 
   // Update brute XP and victories if arena fight

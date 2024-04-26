@@ -3,7 +3,9 @@ import { PETS_TOTAL_ODDS } from './brute/pets';
 import { SKILLS_TOTAL_ODDS } from './brute/skills';
 import { WEAPONS_TOTAL_ODDS, WeaponAnimations } from './brute/weapons';
 
-export const FIGHTS_PER_DAY = 6;
+export const FIGHTS_PER_DAY = 3;
+export const WIN_XP = 5;
+export const LOSE_XP = 4;
 
 export const ARENA_OPPONENTS_COUNT = 4;
 export const ARENA_OPPONENTS_MAX_GAP = 2;

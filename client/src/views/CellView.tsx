@@ -7,7 +7,6 @@ import { Box, Fab, Paper, Tooltip, useMediaQuery } from '@mui/material';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
-import BoxBg from '../components/BoxBg';
 import CellClan from '../components/Cell/CellClan';
 import CellLog from '../components/Cell/CellLog';
 import CellMain from '../components/Cell/CellMain';
@@ -26,7 +25,6 @@ import { useConfirm } from '../hooks/useConfirm';
 import { useLanguage } from '../hooks/useLanguage';
 import useStateAsync from '../hooks/useStateAsync';
 import Server from '../utils/Server';
-import { getRandomAd } from '../utils/ads';
 import catchError from '../utils/catchError';
 import CellMobileView from './mobile/CellMobileView';
 
@@ -101,9 +99,6 @@ const CellView = () => {
       }).catch(catchError(Alert));
     });
   }, [Alert, Confirm, brute, t, updateBrute, updateData]);
-
-  // Randomized advertising
-  const ad = useMemo(() => getRandomAd(language), [language]);
 
   // Report brute
   const confirmReport = useCallback(() => {
@@ -213,7 +208,6 @@ const CellView = () => {
       <>
         {previousBruteArrow}
         <CellMobileView
-          ad={ad}
           logs={logs}
           language={language}
           ownsBrute={ownsBrute}
@@ -314,25 +308,6 @@ const CellView = () => {
               {(ownsBrute || !!brute.clanId) && (
                 <CellClan brute={brute} sx={{ ml: 4 }} />
               )}
-              {/* ADVERT */}
-              <BoxBg
-                src={`/images/${language}/cell/a-bg.gif`}
-                sx={{
-                  width: 300,
-                  height: 205,
-                  ml: 0.5,
-                }}
-              >
-                <Tooltip title={t(`${ad.name}.desc`)}>
-                  <Link to={ad.url} target="_blank" sx={{ width: 200, mx: 4, display: 'inline-block' }}>
-                    <Box
-                      component="img"
-                      src={`/images/redirects/${ad.illustration}`}
-                      sx={{ ml: 1, mt: 3.5 }}
-                    />
-                  </Link>
-                </Tooltip>
-              </BoxBg>
               {/* LOGS */}
               <Box sx={{ ml: 2, mt: 1 }}>
                 {logs.map((log) => <CellLog key={log.id} log={log} />)}
