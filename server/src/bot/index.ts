@@ -19,7 +19,7 @@ import {
   EmbedBuilder,
 } from 'discord.js';
 import { PrismaClient } from '@labrute/prisma';
-import { ExpectedError } from '@labrute/core';
+import { ExpectedError, canLevelUp } from '@labrute/core';
 import Env from '../utils/Env.js';
 import getOpponents from '../utils/brute/getOpponents.js';
 import { doFight } from '../services/fights.js';
@@ -117,15 +117,25 @@ export default async (prisma: PrismaClient) => {
               filter: collectorFilter,
               time: 60_000,
             });
-            const fightLeft = `Il te reste encore ${brute.fightsLeft} combat${
-              brute.fightsLeft > 1 ? 's' : ''
+            const fightLeft = `Il te reste encore ${brute.fightsLeft - 1} combat${
+              brute.fightsLeft - 1 > 1 ? 's' : ''
             }`;
+            const levelupEmbed = new EmbedBuilder()
+              .setColor(0xff00ff)
+              .setTitle(
+                'Level up!',
+              )
+              .setURL(
+                `${Env.SELF_URL}/${brute.name}/level-up`,
+              );
+
             await interaction.editReply({
               content: `Combat lancé. ${
-                brute.fightsLeft > 0
+                brute.fightsLeft - 1 > 0
                   ? fightLeft
                   : 'Tu as terminé tes combats. Reviens demain!'
               }`,
+              embeds: canLevelUp(brute) ? [levelupEmbed] : [],
               components: [],
             });
             try {
@@ -147,7 +157,7 @@ export default async (prisma: PrismaClient) => {
                 confirmation.customId,
               );
 
-              const exampleEmbed = new EmbedBuilder()
+              const FightEmbed = new EmbedBuilder()
                 .setColor(0xff0000)
                 .setTitle(
                   `${user.name} VS ${
@@ -178,7 +188,7 @@ export default async (prisma: PrismaClient) => {
                 .setThumbnail(`${Env.SELF_URL}/images/versus/vs.png`)
                 .setTimestamp();
 
-              await confirmation.reply({ embeds: [exampleEmbed] });
+              await confirmation.reply({ embeds: [FightEmbed] });
             } catch (error: unknown) {
               if (error instanceof Error) {
                 await confirmation.update({
