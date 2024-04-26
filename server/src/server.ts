@@ -45,8 +45,8 @@ async function main(cx: ServerContext) {
 
   initRoutes(app, cx.prisma);
 
-  await initBot();
   cx.logger.info('Init discord bot');
+  await initBot(cx.prisma);
 }
 
 /**

@@ -4,6 +4,7 @@ import { ExpectedError } from '@labrute/core';
 import {
   OAuth2Routes, RESTPostOAuth2AccessTokenResult, RouteBases, RESTGetAPIUserResult,
 } from 'discord.js';
+import fetch from 'node-fetch';
 import Env from '../utils/Env.js';
 import sendError from '../utils/sendError.js';
 
