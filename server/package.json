@@ -1,6 +1,6 @@
 {
   "name": "@labrute/server",
-  "version": "2.49.12",
+  "version": "2.50.4",
   "private": true,
   "exports": "./src/server.js",
   "engines": {
@@ -41,6 +41,7 @@
     "nodemailer": "^6.9.9",
     "spritesmith": "^3.4.0",
     "unique-names-generator": "^4.7.1",
+    "url-join": "^5.0.0",
     "vinyl": "^3.0.0"
   },
   "devDependencies": {

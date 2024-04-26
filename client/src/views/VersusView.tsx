@@ -22,7 +22,7 @@ const VersusView = () => {
   const navigate = useNavigate();
   const Alert = useAlert();
   const { user, updateData } = useAuth();
-  const { brute } = useBrute();
+  const { brute, updateBrute } = useBrute();
   const smallScreen = useMediaQuery('(max-width: 935px)');
 
   // Prevent multi click
@@ -65,21 +65,29 @@ const VersusView = () => {
     if (fight) {
       navigate(`/${brute.name}/fight/${fight.id}`);
 
-      // Update fights left
-      const { fightsLeft } = await Server.Brute.getFightsLeft(brute.name);
-
+      // Update brute data
       updateData((data) => (data ? ({
         ...data,
         brutes: data.brutes.map((b) => (b.name === brute.name ? {
           ...b,
-          fightsLeft,
+          fightsLeft: fight.fightsLeft,
+          xp: b.xp + fight.xpWon,
+          victories: b.victories + fight.victories,
           lastFight: new Date(),
         } : b)),
+      }) : null));
+
+      updateBrute((data) => (data ? ({
+        ...data,
+        fightsLeft: fight.fightsLeft,
+        xp: data.xp + fight.xpWon,
+        victories: data.victories + fight.victories,
+        lastFight: new Date(),
       }) : null));
     }
 
     setFighting(false);
-  }, [Alert, brute, fighting, navigate, opponent, updateData]);
+  }, [Alert, brute, fighting, navigate, opponent, updateBrute, updateData]);
 
   if (brute && opponent && smallScreen) {
     return <VersusMobileView brute={brute} opponent={opponent} startFight={startFight} />;

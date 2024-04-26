@@ -3,7 +3,7 @@
  * Client
 **/
 
-import * as runtime from './runtime/library';
+import * as runtime from './runtime/library.js';
 import $Types = runtime.Types // general types
 import $Public = runtime.Types.Public
 import $Utils = runtime.Types.Utils
@@ -895,8 +895,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 5.8.1
-   * Query Engine version: 78caf6feeaed953168c64e15a249c3e9a033ebe2
+   * Prisma Client JS version: 5.10.2
+   * Query Engine version: 5a9203d0590c951969e85a7d07215503f4672eb9
    */
   export type PrismaVersion = {
     client: string
@@ -2859,6 +2859,16 @@ export namespace Prisma {
      * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/logging#the-log-option).
      */
     log?: (LogLevel | LogDefinition)[]
+    /**
+     * The default values for transactionOptions
+     * maxWait ?= 2000
+     * timeout ?= 5000
+     */
+    transactionOptions?: {
+      maxWait?: number
+      timeout?: number
+      isolationLevel?: Prisma.TransactionIsolationLevel
+    }
   }
 
   /* Types for Logging */
@@ -3245,11 +3255,13 @@ export namespace Prisma {
   export type TournamentCountOutputType = {
     participants: number
     steps: number
+    fights: number
   }
 
   export type TournamentCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     participants?: boolean | TournamentCountOutputTypeCountParticipantsArgs
     steps?: boolean | TournamentCountOutputTypeCountStepsArgs
+    fights?: boolean | TournamentCountOutputTypeCountFightsArgs
   }
 
   // Custom InputTypes
@@ -3278,6 +3290,14 @@ export namespace Prisma {
    */
   export type TournamentCountOutputTypeCountStepsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: TournamentStepWhereInput
+  }
+
+
+  /**
+   * TournamentCountOutputType without action
+   */
+  export type TournamentCountOutputTypeCountFightsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FightWhereInput
   }
 
 
@@ -8777,12 +8797,14 @@ export namespace Prisma {
     id: number | null
     brute1Id: number | null
     brute2Id: number | null
+    tournamentId: number | null
   }
 
   export type FightSumAggregateOutputType = {
     id: number | null
     brute1Id: number | null
     brute2Id: number | null
+    tournamentId: number | null
   }
 
   export type FightMinAggregateOutputType = {
@@ -8794,6 +8816,7 @@ export namespace Prisma {
     loser: string | null
     steps: string | null
     fighters: string | null
+    tournamentId: number | null
   }
 
   export type FightMaxAggregateOutputType = {
@@ -8805,6 +8828,7 @@ export namespace Prisma {
     loser: string | null
     steps: string | null
     fighters: string | null
+    tournamentId: number | null
   }
 
   export type FightCountAggregateOutputType = {
@@ -8816,6 +8840,7 @@ export namespace Prisma {
     loser: number
     steps: number
     fighters: number
+    tournamentId: number
     _all: number
   }
 
@@ -8824,12 +8849,14 @@ export namespace Prisma {
     id?: true
     brute1Id?: true
     brute2Id?: true
+    tournamentId?: true
   }
 
   export type FightSumAggregateInputType = {
     id?: true
     brute1Id?: true
     brute2Id?: true
+    tournamentId?: true
   }
 
   export type FightMinAggregateInputType = {
@@ -8841,6 +8868,7 @@ export namespace Prisma {
     loser?: true
     steps?: true
     fighters?: true
+    tournamentId?: true
   }
 
   export type FightMaxAggregateInputType = {
@@ -8852,6 +8880,7 @@ export namespace Prisma {
     loser?: true
     steps?: true
     fighters?: true
+    tournamentId?: true
   }
 
   export type FightCountAggregateInputType = {
@@ -8863,6 +8892,7 @@ export namespace Prisma {
     loser?: true
     steps?: true
     fighters?: true
+    tournamentId?: true
     _all?: true
   }
 
@@ -8961,6 +8991,7 @@ export namespace Prisma {
     loser: string
     steps: string
     fighters: string
+    tournamentId: number | null
     _count: FightCountAggregateOutputType | null
     _avg: FightAvgAggregateOutputType | null
     _sum: FightSumAggregateOutputType | null
@@ -8991,9 +9022,11 @@ export namespace Prisma {
     loser?: boolean
     steps?: boolean
     fighters?: boolean
+    tournamentId?: boolean
     brute1?: boolean | BruteDefaultArgs<ExtArgs>
     brute2?: boolean | Fight$brute2Args<ExtArgs>
     logs?: boolean | Fight$logsArgs<ExtArgs>
+    tournament?: boolean | Fight$tournamentArgs<ExtArgs>
     TournamentStep?: boolean | Fight$TournamentStepArgs<ExtArgs>
     _count?: boolean | FightCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["fight"]>
@@ -9007,12 +9040,14 @@ export namespace Prisma {
     loser?: boolean
     steps?: boolean
     fighters?: boolean
+    tournamentId?: boolean
   }
 
   export type FightInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     brute1?: boolean | BruteDefaultArgs<ExtArgs>
     brute2?: boolean | Fight$brute2Args<ExtArgs>
     logs?: boolean | Fight$logsArgs<ExtArgs>
+    tournament?: boolean | Fight$tournamentArgs<ExtArgs>
     TournamentStep?: boolean | Fight$TournamentStepArgs<ExtArgs>
     _count?: boolean | FightCountOutputTypeDefaultArgs<ExtArgs>
   }
@@ -9024,6 +9059,7 @@ export namespace Prisma {
       brute1: Prisma.$BrutePayload<ExtArgs>
       brute2: Prisma.$BrutePayload<ExtArgs> | null
       logs: Prisma.$LogPayload<ExtArgs>[]
+      tournament: Prisma.$TournamentPayload<ExtArgs> | null
       TournamentStep: Prisma.$TournamentStepPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -9035,6 +9071,7 @@ export namespace Prisma {
       loser: string
       steps: string
       fighters: string
+      tournamentId: number | null
     }, ExtArgs["result"]["fight"]>
     composites: {}
   }
@@ -9406,6 +9443,8 @@ export namespace Prisma {
 
     logs<T extends Fight$logsArgs<ExtArgs> = {}>(args?: Subset<T, Fight$logsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LogPayload<ExtArgs>, T, 'findMany'> | Null>;
 
+    tournament<T extends Fight$tournamentArgs<ExtArgs> = {}>(args?: Subset<T, Fight$tournamentArgs<ExtArgs>>): Prisma__TournamentClient<$Result.GetResult<Prisma.$TournamentPayload<ExtArgs>, T, 'findUniqueOrThrow'> | null, null, ExtArgs>;
+
     TournamentStep<T extends Fight$TournamentStepArgs<ExtArgs> = {}>(args?: Subset<T, Fight$TournamentStepArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TournamentStepPayload<ExtArgs>, T, 'findMany'> | Null>;
 
     /**
@@ -9444,6 +9483,7 @@ export namespace Prisma {
     readonly loser: FieldRef<"Fight", 'String'>
     readonly steps: FieldRef<"Fight", 'String'>
     readonly fighters: FieldRef<"Fight", 'String'>
+    readonly tournamentId: FieldRef<"Fight", 'Int'>
   }
     
 
@@ -9798,6 +9838,22 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: LogScalarFieldEnum | LogScalarFieldEnum[]
+  }
+
+
+  /**
+   * Fight.tournament
+   */
+  export type Fight$tournamentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Tournament
+     */
+    select?: TournamentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: TournamentInclude<ExtArgs> | null
+    where?: TournamentWhereInput
   }
 
 
@@ -12100,6 +12156,7 @@ export namespace Prisma {
     rounds?: boolean
     participants?: boolean | Tournament$participantsArgs<ExtArgs>
     steps?: boolean | Tournament$stepsArgs<ExtArgs>
+    fights?: boolean | Tournament$fightsArgs<ExtArgs>
     _count?: boolean | TournamentCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["tournament"]>
 
@@ -12113,6 +12170,7 @@ export namespace Prisma {
   export type TournamentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     participants?: boolean | Tournament$participantsArgs<ExtArgs>
     steps?: boolean | Tournament$stepsArgs<ExtArgs>
+    fights?: boolean | Tournament$fightsArgs<ExtArgs>
     _count?: boolean | TournamentCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -12122,6 +12180,7 @@ export namespace Prisma {
     objects: {
       participants: Prisma.$BrutePayload<ExtArgs>[]
       steps: Prisma.$TournamentStepPayload<ExtArgs>[]
+      fights: Prisma.$FightPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -12496,6 +12555,8 @@ export namespace Prisma {
     participants<T extends Tournament$participantsArgs<ExtArgs> = {}>(args?: Subset<T, Tournament$participantsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BrutePayload<ExtArgs>, T, 'findMany'> | Null>;
 
     steps<T extends Tournament$stepsArgs<ExtArgs> = {}>(args?: Subset<T, Tournament$stepsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TournamentStepPayload<ExtArgs>, T, 'findMany'> | Null>;
+
+    fights<T extends Tournament$fightsArgs<ExtArgs> = {}>(args?: Subset<T, Tournament$fightsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FightPayload<ExtArgs>, T, 'findMany'> | Null>;
 
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -12888,6 +12949,27 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: TournamentStepScalarFieldEnum | TournamentStepScalarFieldEnum[]
+  }
+
+
+  /**
+   * Tournament.fights
+   */
+  export type Tournament$fightsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Fight
+     */
+    select?: FightSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: FightInclude<ExtArgs> | null
+    where?: FightWhereInput
+    orderBy?: FightOrderByWithRelationInput | FightOrderByWithRelationInput[]
+    cursor?: FightWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FightScalarFieldEnum | FightScalarFieldEnum[]
   }
 
 
@@ -19757,19 +19839,16 @@ export namespace Prisma {
 
   export type ServerStateMinAggregateOutputType = {
     id: number | null
-    ready: boolean | null
     globalTournamentValid: boolean | null
   }
 
   export type ServerStateMaxAggregateOutputType = {
     id: number | null
-    ready: boolean | null
     globalTournamentValid: boolean | null
   }
 
   export type ServerStateCountAggregateOutputType = {
     id: number
-    ready: number
     globalTournamentValid: number
     _all: number
   }
@@ -19785,19 +19864,16 @@ export namespace Prisma {
 
   export type ServerStateMinAggregateInputType = {
     id?: true
-    ready?: true
     globalTournamentValid?: true
   }
 
   export type ServerStateMaxAggregateInputType = {
     id?: true
-    ready?: true
     globalTournamentValid?: true
   }
 
   export type ServerStateCountAggregateInputType = {
     id?: true
-    ready?: true
     globalTournamentValid?: true
     _all?: true
   }
@@ -19890,7 +19966,6 @@ export namespace Prisma {
 
   export type ServerStateGroupByOutputType = {
     id: number
-    ready: boolean
     globalTournamentValid: boolean
     _count: ServerStateCountAggregateOutputType | null
     _avg: ServerStateAvgAggregateOutputType | null
@@ -19915,13 +19990,11 @@ export namespace Prisma {
 
   export type ServerStateSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    ready?: boolean
     globalTournamentValid?: boolean
   }, ExtArgs["result"]["serverState"]>
 
   export type ServerStateSelectScalar = {
     id?: boolean
-    ready?: boolean
     globalTournamentValid?: boolean
   }
 
@@ -19931,7 +20004,6 @@ export namespace Prisma {
     objects: {}
     scalars: $Extensions.GetPayloadResult<{
       id: number
-      ready: boolean
       globalTournamentValid: boolean
     }, ExtArgs["result"]["serverState"]>
     composites: {}
@@ -20328,7 +20400,6 @@ export namespace Prisma {
    */ 
   interface ServerStateFieldRefs {
     readonly id: FieldRef<"ServerState", 'Int'>
-    readonly ready: FieldRef<"ServerState", 'Boolean'>
     readonly globalTournamentValid: FieldRef<"ServerState", 'Boolean'>
   }
     
@@ -26594,7 +26665,8 @@ export namespace Prisma {
     winner: 'winner',
     loser: 'loser',
     steps: 'steps',
-    fighters: 'fighters'
+    fighters: 'fighters',
+    tournamentId: 'tournamentId'
   };
 
   export type FightScalarFieldEnum = (typeof FightScalarFieldEnum)[keyof typeof FightScalarFieldEnum]
@@ -26716,7 +26788,6 @@ export namespace Prisma {
 
   export const ServerStateScalarFieldEnum: {
     id: 'id',
-    ready: 'ready',
     globalTournamentValid: 'globalTournamentValid'
   };
 
@@ -27719,9 +27790,11 @@ export namespace Prisma {
     loser?: StringFilter<"Fight"> | string
     steps?: StringFilter<"Fight"> | string
     fighters?: StringFilter<"Fight"> | string
+    tournamentId?: IntNullableFilter<"Fight"> | number | null
     brute1?: XOR<BruteRelationFilter, BruteWhereInput>
     brute2?: XOR<BruteNullableRelationFilter, BruteWhereInput> | null
     logs?: LogListRelationFilter
+    tournament?: XOR<TournamentNullableRelationFilter, TournamentWhereInput> | null
     TournamentStep?: TournamentStepListRelationFilter
   }
 
@@ -27734,9 +27807,11 @@ export namespace Prisma {
     loser?: SortOrder
     steps?: SortOrder
     fighters?: SortOrder
+    tournamentId?: SortOrderInput | SortOrder
     brute1?: BruteOrderByWithRelationInput
     brute2?: BruteOrderByWithRelationInput
     logs?: LogOrderByRelationAggregateInput
+    tournament?: TournamentOrderByWithRelationInput
     TournamentStep?: TournamentStepOrderByRelationAggregateInput
   }
 
@@ -27752,9 +27827,11 @@ export namespace Prisma {
     loser?: StringFilter<"Fight"> | string
     steps?: StringFilter<"Fight"> | string
     fighters?: StringFilter<"Fight"> | string
+    tournamentId?: IntNullableFilter<"Fight"> | number | null
     brute1?: XOR<BruteRelationFilter, BruteWhereInput>
     brute2?: XOR<BruteNullableRelationFilter, BruteWhereInput> | null
     logs?: LogListRelationFilter
+    tournament?: XOR<TournamentNullableRelationFilter, TournamentWhereInput> | null
     TournamentStep?: TournamentStepListRelationFilter
   }, "id">
 
@@ -27767,6 +27844,7 @@ export namespace Prisma {
     loser?: SortOrder
     steps?: SortOrder
     fighters?: SortOrder
+    tournamentId?: SortOrderInput | SortOrder
     _count?: FightCountOrderByAggregateInput
     _avg?: FightAvgOrderByAggregateInput
     _max?: FightMaxOrderByAggregateInput
@@ -27786,6 +27864,7 @@ export namespace Prisma {
     loser?: StringWithAggregatesFilter<"Fight"> | string
     steps?: StringWithAggregatesFilter<"Fight"> | string
     fighters?: StringWithAggregatesFilter<"Fight"> | string
+    tournamentId?: IntNullableWithAggregatesFilter<"Fight"> | number | null
   }
 
   export type LogWhereInput = {
@@ -27960,6 +28039,7 @@ export namespace Prisma {
     rounds?: IntFilter<"Tournament"> | number
     participants?: BruteListRelationFilter
     steps?: TournamentStepListRelationFilter
+    fights?: FightListRelationFilter
   }
 
   export type TournamentOrderByWithRelationInput = {
@@ -27969,6 +28049,7 @@ export namespace Prisma {
     rounds?: SortOrder
     participants?: BruteOrderByRelationAggregateInput
     steps?: TournamentStepOrderByRelationAggregateInput
+    fights?: FightOrderByRelationAggregateInput
   }
 
   export type TournamentWhereUniqueInput = Prisma.AtLeast<{
@@ -27981,6 +28062,7 @@ export namespace Prisma {
     rounds?: IntFilter<"Tournament"> | number
     participants?: BruteListRelationFilter
     steps?: TournamentStepListRelationFilter
+    fights?: FightListRelationFilter
   }, "id">
 
   export type TournamentOrderByWithAggregationInput = {
@@ -28399,13 +28481,11 @@ export namespace Prisma {
     OR?: ServerStateWhereInput[]
     NOT?: ServerStateWhereInput | ServerStateWhereInput[]
     id?: IntFilter<"ServerState"> | number
-    ready?: BoolFilter<"ServerState"> | boolean
     globalTournamentValid?: BoolFilter<"ServerState"> | boolean
   }
 
   export type ServerStateOrderByWithRelationInput = {
     id?: SortOrder
-    ready?: SortOrder
     globalTournamentValid?: SortOrder
   }
 
@@ -28414,13 +28494,11 @@ export namespace Prisma {
     AND?: ServerStateWhereInput | ServerStateWhereInput[]
     OR?: ServerStateWhereInput[]
     NOT?: ServerStateWhereInput | ServerStateWhereInput[]
-    ready?: BoolFilter<"ServerState"> | boolean
     globalTournamentValid?: BoolFilter<"ServerState"> | boolean
   }, "id">
 
   export type ServerStateOrderByWithAggregationInput = {
     id?: SortOrder
-    ready?: SortOrder
     globalTournamentValid?: SortOrder
     _count?: ServerStateCountOrderByAggregateInput
     _avg?: ServerStateAvgOrderByAggregateInput
@@ -28434,7 +28512,6 @@ export namespace Prisma {
     OR?: ServerStateScalarWhereWithAggregatesInput[]
     NOT?: ServerStateScalarWhereWithAggregatesInput | ServerStateScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"ServerState"> | number
-    ready?: BoolWithAggregatesFilter<"ServerState"> | boolean
     globalTournamentValid?: BoolWithAggregatesFilter<"ServerState"> | boolean
   }
 
@@ -29537,6 +29614,7 @@ export namespace Prisma {
     brute1: BruteCreateNestedOneWithoutFightsInput
     brute2?: BruteCreateNestedOneWithoutFightsAsAdversaryInput
     logs?: LogCreateNestedManyWithoutFightInput
+    tournament?: TournamentCreateNestedOneWithoutFightsInput
     TournamentStep?: TournamentStepCreateNestedManyWithoutFightInput
   }
 
@@ -29549,6 +29627,7 @@ export namespace Prisma {
     loser: string
     steps: string
     fighters: string
+    tournamentId?: number | null
     logs?: LogUncheckedCreateNestedManyWithoutFightInput
     TournamentStep?: TournamentStepUncheckedCreateNestedManyWithoutFightInput
   }
@@ -29562,6 +29641,7 @@ export namespace Prisma {
     brute1?: BruteUpdateOneRequiredWithoutFightsNestedInput
     brute2?: BruteUpdateOneWithoutFightsAsAdversaryNestedInput
     logs?: LogUpdateManyWithoutFightNestedInput
+    tournament?: TournamentUpdateOneWithoutFightsNestedInput
     TournamentStep?: TournamentStepUpdateManyWithoutFightNestedInput
   }
 
@@ -29574,6 +29654,7 @@ export namespace Prisma {
     loser?: StringFieldUpdateOperationsInput | string
     steps?: StringFieldUpdateOperationsInput | string
     fighters?: StringFieldUpdateOperationsInput | string
+    tournamentId?: NullableIntFieldUpdateOperationsInput | number | null
     logs?: LogUncheckedUpdateManyWithoutFightNestedInput
     TournamentStep?: TournamentStepUncheckedUpdateManyWithoutFightNestedInput
   }
@@ -29587,6 +29668,7 @@ export namespace Prisma {
     loser: string
     steps: string
     fighters: string
+    tournamentId?: number | null
   }
 
   export type FightUpdateManyMutationInput = {
@@ -29606,6 +29688,7 @@ export namespace Prisma {
     loser?: StringFieldUpdateOperationsInput | string
     steps?: StringFieldUpdateOperationsInput | string
     fighters?: StringFieldUpdateOperationsInput | string
+    tournamentId?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type LogCreateInput = {
@@ -29780,6 +29863,7 @@ export namespace Prisma {
     rounds: number
     participants?: BruteCreateNestedManyWithoutTournamentsInput
     steps?: TournamentStepCreateNestedManyWithoutTournamentInput
+    fights?: FightCreateNestedManyWithoutTournamentInput
   }
 
   export type TournamentUncheckedCreateInput = {
@@ -29789,6 +29873,7 @@ export namespace Prisma {
     rounds: number
     participants?: BruteUncheckedCreateNestedManyWithoutTournamentsInput
     steps?: TournamentStepUncheckedCreateNestedManyWithoutTournamentInput
+    fights?: FightUncheckedCreateNestedManyWithoutTournamentInput
   }
 
   export type TournamentUpdateInput = {
@@ -29797,6 +29882,7 @@ export namespace Prisma {
     rounds?: IntFieldUpdateOperationsInput | number
     participants?: BruteUpdateManyWithoutTournamentsNestedInput
     steps?: TournamentStepUpdateManyWithoutTournamentNestedInput
+    fights?: FightUpdateManyWithoutTournamentNestedInput
   }
 
   export type TournamentUncheckedUpdateInput = {
@@ -29806,6 +29892,7 @@ export namespace Prisma {
     rounds?: IntFieldUpdateOperationsInput | number
     participants?: BruteUncheckedUpdateManyWithoutTournamentsNestedInput
     steps?: TournamentStepUncheckedUpdateManyWithoutTournamentNestedInput
+    fights?: FightUncheckedUpdateManyWithoutTournamentNestedInput
   }
 
   export type TournamentCreateManyInput = {
@@ -30172,41 +30259,34 @@ export namespace Prisma {
   }
 
   export type ServerStateCreateInput = {
-    ready?: boolean
     globalTournamentValid?: boolean
   }
 
   export type ServerStateUncheckedCreateInput = {
     id?: number
-    ready?: boolean
     globalTournamentValid?: boolean
   }
 
   export type ServerStateUpdateInput = {
-    ready?: BoolFieldUpdateOperationsInput | boolean
     globalTournamentValid?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type ServerStateUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
-    ready?: BoolFieldUpdateOperationsInput | boolean
     globalTournamentValid?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type ServerStateCreateManyInput = {
     id?: number
-    ready?: boolean
     globalTournamentValid?: boolean
   }
 
   export type ServerStateUpdateManyMutationInput = {
-    ready?: BoolFieldUpdateOperationsInput | boolean
     globalTournamentValid?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type ServerStateUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
-    ready?: BoolFieldUpdateOperationsInput | boolean
     globalTournamentValid?: BoolFieldUpdateOperationsInput | boolean
   }
 
@@ -31390,6 +31470,11 @@ export namespace Prisma {
     _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
+  export type TournamentNullableRelationFilter = {
+    is?: TournamentWhereInput | null
+    isNot?: TournamentWhereInput | null
+  }
+
   export type TournamentStepListRelationFilter = {
     every?: TournamentStepWhereInput
     some?: TournamentStepWhereInput
@@ -31409,12 +31494,14 @@ export namespace Prisma {
     loser?: SortOrder
     steps?: SortOrder
     fighters?: SortOrder
+    tournamentId?: SortOrder
   }
 
   export type FightAvgOrderByAggregateInput = {
     id?: SortOrder
     brute1Id?: SortOrder
     brute2Id?: SortOrder
+    tournamentId?: SortOrder
   }
 
   export type FightMaxOrderByAggregateInput = {
@@ -31426,6 +31513,7 @@ export namespace Prisma {
     loser?: SortOrder
     steps?: SortOrder
     fighters?: SortOrder
+    tournamentId?: SortOrder
   }
 
   export type FightMinOrderByAggregateInput = {
@@ -31437,12 +31525,14 @@ export namespace Prisma {
     loser?: SortOrder
     steps?: SortOrder
     fighters?: SortOrder
+    tournamentId?: SortOrder
   }
 
   export type FightSumOrderByAggregateInput = {
     id?: SortOrder
     brute1Id?: SortOrder
     brute2Id?: SortOrder
+    tournamentId?: SortOrder
   }
 
   export type EnumLogTypeFilter<$PrismaModel = never> = {
@@ -32057,7 +32147,6 @@ export namespace Prisma {
 
   export type ServerStateCountOrderByAggregateInput = {
     id?: SortOrder
-    ready?: SortOrder
     globalTournamentValid?: SortOrder
   }
 
@@ -32067,13 +32156,11 @@ export namespace Prisma {
 
   export type ServerStateMaxOrderByAggregateInput = {
     id?: SortOrder
-    ready?: SortOrder
     globalTournamentValid?: SortOrder
   }
 
   export type ServerStateMinOrderByAggregateInput = {
     id?: SortOrder
-    ready?: SortOrder
     globalTournamentValid?: SortOrder
   }
 
@@ -33468,6 +33555,12 @@ export namespace Prisma {
     connect?: LogWhereUniqueInput | LogWhereUniqueInput[]
   }
 
+  export type TournamentCreateNestedOneWithoutFightsInput = {
+    create?: XOR<TournamentCreateWithoutFightsInput, TournamentUncheckedCreateWithoutFightsInput>
+    connectOrCreate?: TournamentCreateOrConnectWithoutFightsInput
+    connect?: TournamentWhereUniqueInput
+  }
+
   export type TournamentStepCreateNestedManyWithoutFightInput = {
     create?: XOR<TournamentStepCreateWithoutFightInput, TournamentStepUncheckedCreateWithoutFightInput> | TournamentStepCreateWithoutFightInput[] | TournamentStepUncheckedCreateWithoutFightInput[]
     connectOrCreate?: TournamentStepCreateOrConnectWithoutFightInput | TournamentStepCreateOrConnectWithoutFightInput[]
@@ -33519,6 +33612,16 @@ export namespace Prisma {
     update?: LogUpdateWithWhereUniqueWithoutFightInput | LogUpdateWithWhereUniqueWithoutFightInput[]
     updateMany?: LogUpdateManyWithWhereWithoutFightInput | LogUpdateManyWithWhereWithoutFightInput[]
     deleteMany?: LogScalarWhereInput | LogScalarWhereInput[]
+  }
+
+  export type TournamentUpdateOneWithoutFightsNestedInput = {
+    create?: XOR<TournamentCreateWithoutFightsInput, TournamentUncheckedCreateWithoutFightsInput>
+    connectOrCreate?: TournamentCreateOrConnectWithoutFightsInput
+    upsert?: TournamentUpsertWithoutFightsInput
+    disconnect?: TournamentWhereInput | boolean
+    delete?: TournamentWhereInput | boolean
+    connect?: TournamentWhereUniqueInput
+    update?: XOR<XOR<TournamentUpdateToOneWithWhereWithoutFightsInput, TournamentUpdateWithoutFightsInput>, TournamentUncheckedUpdateWithoutFightsInput>
   }
 
   export type TournamentStepUpdateManyWithoutFightNestedInput = {
@@ -33653,6 +33756,13 @@ export namespace Prisma {
     connect?: TournamentStepWhereUniqueInput | TournamentStepWhereUniqueInput[]
   }
 
+  export type FightCreateNestedManyWithoutTournamentInput = {
+    create?: XOR<FightCreateWithoutTournamentInput, FightUncheckedCreateWithoutTournamentInput> | FightCreateWithoutTournamentInput[] | FightUncheckedCreateWithoutTournamentInput[]
+    connectOrCreate?: FightCreateOrConnectWithoutTournamentInput | FightCreateOrConnectWithoutTournamentInput[]
+    createMany?: FightCreateManyTournamentInputEnvelope
+    connect?: FightWhereUniqueInput | FightWhereUniqueInput[]
+  }
+
   export type BruteUncheckedCreateNestedManyWithoutTournamentsInput = {
     create?: XOR<BruteCreateWithoutTournamentsInput, BruteUncheckedCreateWithoutTournamentsInput> | BruteCreateWithoutTournamentsInput[] | BruteUncheckedCreateWithoutTournamentsInput[]
     connectOrCreate?: BruteCreateOrConnectWithoutTournamentsInput | BruteCreateOrConnectWithoutTournamentsInput[]
@@ -33664,6 +33774,13 @@ export namespace Prisma {
     connectOrCreate?: TournamentStepCreateOrConnectWithoutTournamentInput | TournamentStepCreateOrConnectWithoutTournamentInput[]
     createMany?: TournamentStepCreateManyTournamentInputEnvelope
     connect?: TournamentStepWhereUniqueInput | TournamentStepWhereUniqueInput[]
+  }
+
+  export type FightUncheckedCreateNestedManyWithoutTournamentInput = {
+    create?: XOR<FightCreateWithoutTournamentInput, FightUncheckedCreateWithoutTournamentInput> | FightCreateWithoutTournamentInput[] | FightUncheckedCreateWithoutTournamentInput[]
+    connectOrCreate?: FightCreateOrConnectWithoutTournamentInput | FightCreateOrConnectWithoutTournamentInput[]
+    createMany?: FightCreateManyTournamentInputEnvelope
+    connect?: FightWhereUniqueInput | FightWhereUniqueInput[]
   }
 
   export type EnumTournamentTypeFieldUpdateOperationsInput = {
@@ -33697,6 +33814,20 @@ export namespace Prisma {
     deleteMany?: TournamentStepScalarWhereInput | TournamentStepScalarWhereInput[]
   }
 
+  export type FightUpdateManyWithoutTournamentNestedInput = {
+    create?: XOR<FightCreateWithoutTournamentInput, FightUncheckedCreateWithoutTournamentInput> | FightCreateWithoutTournamentInput[] | FightUncheckedCreateWithoutTournamentInput[]
+    connectOrCreate?: FightCreateOrConnectWithoutTournamentInput | FightCreateOrConnectWithoutTournamentInput[]
+    upsert?: FightUpsertWithWhereUniqueWithoutTournamentInput | FightUpsertWithWhereUniqueWithoutTournamentInput[]
+    createMany?: FightCreateManyTournamentInputEnvelope
+    set?: FightWhereUniqueInput | FightWhereUniqueInput[]
+    disconnect?: FightWhereUniqueInput | FightWhereUniqueInput[]
+    delete?: FightWhereUniqueInput | FightWhereUniqueInput[]
+    connect?: FightWhereUniqueInput | FightWhereUniqueInput[]
+    update?: FightUpdateWithWhereUniqueWithoutTournamentInput | FightUpdateWithWhereUniqueWithoutTournamentInput[]
+    updateMany?: FightUpdateManyWithWhereWithoutTournamentInput | FightUpdateManyWithWhereWithoutTournamentInput[]
+    deleteMany?: FightScalarWhereInput | FightScalarWhereInput[]
+  }
+
   export type BruteUncheckedUpdateManyWithoutTournamentsNestedInput = {
     create?: XOR<BruteCreateWithoutTournamentsInput, BruteUncheckedCreateWithoutTournamentsInput> | BruteCreateWithoutTournamentsInput[] | BruteUncheckedCreateWithoutTournamentsInput[]
     connectOrCreate?: BruteCreateOrConnectWithoutTournamentsInput | BruteCreateOrConnectWithoutTournamentsInput[]
@@ -33722,6 +33853,20 @@ export namespace Prisma {
     update?: TournamentStepUpdateWithWhereUniqueWithoutTournamentInput | TournamentStepUpdateWithWhereUniqueWithoutTournamentInput[]
     updateMany?: TournamentStepUpdateManyWithWhereWithoutTournamentInput | TournamentStepUpdateManyWithWhereWithoutTournamentInput[]
     deleteMany?: TournamentStepScalarWhereInput | TournamentStepScalarWhereInput[]
+  }
+
+  export type FightUncheckedUpdateManyWithoutTournamentNestedInput = {
+    create?: XOR<FightCreateWithoutTournamentInput, FightUncheckedCreateWithoutTournamentInput> | FightCreateWithoutTournamentInput[] | FightUncheckedCreateWithoutTournamentInput[]
+    connectOrCreate?: FightCreateOrConnectWithoutTournamentInput | FightCreateOrConnectWithoutTournamentInput[]
+    upsert?: FightUpsertWithWhereUniqueWithoutTournamentInput | FightUpsertWithWhereUniqueWithoutTournamentInput[]
+    createMany?: FightCreateManyTournamentInputEnvelope
+    set?: FightWhereUniqueInput | FightWhereUniqueInput[]
+    disconnect?: FightWhereUniqueInput | FightWhereUniqueInput[]
+    delete?: FightWhereUniqueInput | FightWhereUniqueInput[]
+    connect?: FightWhereUniqueInput | FightWhereUniqueInput[]
+    update?: FightUpdateWithWhereUniqueWithoutTournamentInput | FightUpdateWithWhereUniqueWithoutTournamentInput[]
+    updateMany?: FightUpdateManyWithWhereWithoutTournamentInput | FightUpdateManyWithWhereWithoutTournamentInput[]
+    deleteMany?: FightScalarWhereInput | FightScalarWhereInput[]
   }
 
   export type TournamentCreateNestedOneWithoutStepsInput = {
@@ -35972,6 +36117,7 @@ export namespace Prisma {
     fighters: string
     brute2?: BruteCreateNestedOneWithoutFightsAsAdversaryInput
     logs?: LogCreateNestedManyWithoutFightInput
+    tournament?: TournamentCreateNestedOneWithoutFightsInput
     TournamentStep?: TournamentStepCreateNestedManyWithoutFightInput
   }
 
@@ -35983,6 +36129,7 @@ export namespace Prisma {
     loser: string
     steps: string
     fighters: string
+    tournamentId?: number | null
     logs?: LogUncheckedCreateNestedManyWithoutFightInput
     TournamentStep?: TournamentStepUncheckedCreateNestedManyWithoutFightInput
   }
@@ -36005,6 +36152,7 @@ export namespace Prisma {
     fighters: string
     brute1: BruteCreateNestedOneWithoutFightsInput
     logs?: LogCreateNestedManyWithoutFightInput
+    tournament?: TournamentCreateNestedOneWithoutFightsInput
     TournamentStep?: TournamentStepCreateNestedManyWithoutFightInput
   }
 
@@ -36016,6 +36164,7 @@ export namespace Prisma {
     loser: string
     steps: string
     fighters: string
+    tournamentId?: number | null
     logs?: LogUncheckedCreateNestedManyWithoutFightInput
     TournamentStep?: TournamentStepUncheckedCreateNestedManyWithoutFightInput
   }
@@ -36099,6 +36248,7 @@ export namespace Prisma {
     type?: $Enums.TournamentType
     rounds: number
     steps?: TournamentStepCreateNestedManyWithoutTournamentInput
+    fights?: FightCreateNestedManyWithoutTournamentInput
   }
 
   export type TournamentUncheckedCreateWithoutParticipantsInput = {
@@ -36107,6 +36257,7 @@ export namespace Prisma {
     type?: $Enums.TournamentType
     rounds: number
     steps?: TournamentStepUncheckedCreateNestedManyWithoutTournamentInput
+    fights?: FightUncheckedCreateNestedManyWithoutTournamentInput
   }
 
   export type TournamentCreateOrConnectWithoutParticipantsInput = {
@@ -36958,6 +37109,7 @@ export namespace Prisma {
     loser?: StringFilter<"Fight"> | string
     steps?: StringFilter<"Fight"> | string
     fighters?: StringFilter<"Fight"> | string
+    tournamentId?: IntNullableFilter<"Fight"> | number | null
   }
 
   export type FightUpsertWithWhereUniqueWithoutBrute2Input = {
@@ -37644,6 +37796,28 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type TournamentCreateWithoutFightsInput = {
+    date: Date | string
+    type?: $Enums.TournamentType
+    rounds: number
+    participants?: BruteCreateNestedManyWithoutTournamentsInput
+    steps?: TournamentStepCreateNestedManyWithoutTournamentInput
+  }
+
+  export type TournamentUncheckedCreateWithoutFightsInput = {
+    id?: number
+    date: Date | string
+    type?: $Enums.TournamentType
+    rounds: number
+    participants?: BruteUncheckedCreateNestedManyWithoutTournamentsInput
+    steps?: TournamentStepUncheckedCreateNestedManyWithoutTournamentInput
+  }
+
+  export type TournamentCreateOrConnectWithoutFightsInput = {
+    where: TournamentWhereUniqueInput
+    create: XOR<TournamentCreateWithoutFightsInput, TournamentUncheckedCreateWithoutFightsInput>
+  }
+
   export type TournamentStepCreateWithoutFightInput = {
     step: number
     tournament: TournamentCreateNestedOneWithoutStepsInput
@@ -37949,6 +38123,34 @@ export namespace Prisma {
     data: XOR<LogUpdateManyMutationInput, LogUncheckedUpdateManyWithoutFightInput>
   }
 
+  export type TournamentUpsertWithoutFightsInput = {
+    update: XOR<TournamentUpdateWithoutFightsInput, TournamentUncheckedUpdateWithoutFightsInput>
+    create: XOR<TournamentCreateWithoutFightsInput, TournamentUncheckedCreateWithoutFightsInput>
+    where?: TournamentWhereInput
+  }
+
+  export type TournamentUpdateToOneWithWhereWithoutFightsInput = {
+    where?: TournamentWhereInput
+    data: XOR<TournamentUpdateWithoutFightsInput, TournamentUncheckedUpdateWithoutFightsInput>
+  }
+
+  export type TournamentUpdateWithoutFightsInput = {
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumTournamentTypeFieldUpdateOperationsInput | $Enums.TournamentType
+    rounds?: IntFieldUpdateOperationsInput | number
+    participants?: BruteUpdateManyWithoutTournamentsNestedInput
+    steps?: TournamentStepUpdateManyWithoutTournamentNestedInput
+  }
+
+  export type TournamentUncheckedUpdateWithoutFightsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumTournamentTypeFieldUpdateOperationsInput | $Enums.TournamentType
+    rounds?: IntFieldUpdateOperationsInput | number
+    participants?: BruteUncheckedUpdateManyWithoutTournamentsNestedInput
+    steps?: TournamentStepUncheckedUpdateManyWithoutTournamentNestedInput
+  }
+
   export type TournamentStepUpsertWithWhereUniqueWithoutFightInput = {
     where: TournamentStepWhereUniqueInput
     update: XOR<TournamentStepUpdateWithoutFightInput, TournamentStepUncheckedUpdateWithoutFightInput>
@@ -38111,6 +38313,7 @@ export namespace Prisma {
     fighters: string
     brute1: BruteCreateNestedOneWithoutFightsInput
     brute2?: BruteCreateNestedOneWithoutFightsAsAdversaryInput
+    tournament?: TournamentCreateNestedOneWithoutFightsInput
     TournamentStep?: TournamentStepCreateNestedManyWithoutFightInput
   }
 
@@ -38123,6 +38326,7 @@ export namespace Prisma {
     loser: string
     steps: string
     fighters: string
+    tournamentId?: number | null
     TournamentStep?: TournamentStepUncheckedCreateNestedManyWithoutFightInput
   }
 
@@ -38284,6 +38488,7 @@ export namespace Prisma {
     fighters?: StringFieldUpdateOperationsInput | string
     brute1?: BruteUpdateOneRequiredWithoutFightsNestedInput
     brute2?: BruteUpdateOneWithoutFightsAsAdversaryNestedInput
+    tournament?: TournamentUpdateOneWithoutFightsNestedInput
     TournamentStep?: TournamentStepUpdateManyWithoutFightNestedInput
   }
 
@@ -38296,6 +38501,7 @@ export namespace Prisma {
     loser?: StringFieldUpdateOperationsInput | string
     steps?: StringFieldUpdateOperationsInput | string
     fighters?: StringFieldUpdateOperationsInput | string
+    tournamentId?: NullableIntFieldUpdateOperationsInput | number | null
     TournamentStep?: TournamentStepUncheckedUpdateManyWithoutFightNestedInput
   }
 
@@ -38710,6 +38916,41 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type FightCreateWithoutTournamentInput = {
+    date?: Date | string
+    winner: string
+    loser: string
+    steps: string
+    fighters: string
+    brute1: BruteCreateNestedOneWithoutFightsInput
+    brute2?: BruteCreateNestedOneWithoutFightsAsAdversaryInput
+    logs?: LogCreateNestedManyWithoutFightInput
+    TournamentStep?: TournamentStepCreateNestedManyWithoutFightInput
+  }
+
+  export type FightUncheckedCreateWithoutTournamentInput = {
+    id?: number
+    date?: Date | string
+    brute1Id: number
+    brute2Id?: number | null
+    winner: string
+    loser: string
+    steps: string
+    fighters: string
+    logs?: LogUncheckedCreateNestedManyWithoutFightInput
+    TournamentStep?: TournamentStepUncheckedCreateNestedManyWithoutFightInput
+  }
+
+  export type FightCreateOrConnectWithoutTournamentInput = {
+    where: FightWhereUniqueInput
+    create: XOR<FightCreateWithoutTournamentInput, FightUncheckedCreateWithoutTournamentInput>
+  }
+
+  export type FightCreateManyTournamentInputEnvelope = {
+    data: FightCreateManyTournamentInput | FightCreateManyTournamentInput[]
+    skipDuplicates?: boolean
+  }
+
   export type BruteUpsertWithWhereUniqueWithoutTournamentsInput = {
     where: BruteWhereUniqueInput
     update: XOR<BruteUpdateWithoutTournamentsInput, BruteUncheckedUpdateWithoutTournamentsInput>
@@ -38742,11 +38983,28 @@ export namespace Prisma {
     data: XOR<TournamentStepUpdateManyMutationInput, TournamentStepUncheckedUpdateManyWithoutTournamentInput>
   }
 
+  export type FightUpsertWithWhereUniqueWithoutTournamentInput = {
+    where: FightWhereUniqueInput
+    update: XOR<FightUpdateWithoutTournamentInput, FightUncheckedUpdateWithoutTournamentInput>
+    create: XOR<FightCreateWithoutTournamentInput, FightUncheckedCreateWithoutTournamentInput>
+  }
+
+  export type FightUpdateWithWhereUniqueWithoutTournamentInput = {
+    where: FightWhereUniqueInput
+    data: XOR<FightUpdateWithoutTournamentInput, FightUncheckedUpdateWithoutTournamentInput>
+  }
+
+  export type FightUpdateManyWithWhereWithoutTournamentInput = {
+    where: FightScalarWhereInput
+    data: XOR<FightUpdateManyMutationInput, FightUncheckedUpdateManyWithoutTournamentInput>
+  }
+
   export type TournamentCreateWithoutStepsInput = {
     date: Date | string
     type?: $Enums.TournamentType
     rounds: number
     participants?: BruteCreateNestedManyWithoutTournamentsInput
+    fights?: FightCreateNestedManyWithoutTournamentInput
   }
 
   export type TournamentUncheckedCreateWithoutStepsInput = {
@@ -38755,6 +39013,7 @@ export namespace Prisma {
     type?: $Enums.TournamentType
     rounds: number
     participants?: BruteUncheckedCreateNestedManyWithoutTournamentsInput
+    fights?: FightUncheckedCreateNestedManyWithoutTournamentInput
   }
 
   export type TournamentCreateOrConnectWithoutStepsInput = {
@@ -38771,6 +39030,7 @@ export namespace Prisma {
     brute1: BruteCreateNestedOneWithoutFightsInput
     brute2?: BruteCreateNestedOneWithoutFightsAsAdversaryInput
     logs?: LogCreateNestedManyWithoutFightInput
+    tournament?: TournamentCreateNestedOneWithoutFightsInput
   }
 
   export type FightUncheckedCreateWithoutTournamentStepInput = {
@@ -38782,6 +39042,7 @@ export namespace Prisma {
     loser: string
     steps: string
     fighters: string
+    tournamentId?: number | null
     logs?: LogUncheckedCreateNestedManyWithoutFightInput
   }
 
@@ -38806,6 +39067,7 @@ export namespace Prisma {
     type?: EnumTournamentTypeFieldUpdateOperationsInput | $Enums.TournamentType
     rounds?: IntFieldUpdateOperationsInput | number
     participants?: BruteUpdateManyWithoutTournamentsNestedInput
+    fights?: FightUpdateManyWithoutTournamentNestedInput
   }
 
   export type TournamentUncheckedUpdateWithoutStepsInput = {
@@ -38814,6 +39076,7 @@ export namespace Prisma {
     type?: EnumTournamentTypeFieldUpdateOperationsInput | $Enums.TournamentType
     rounds?: IntFieldUpdateOperationsInput | number
     participants?: BruteUncheckedUpdateManyWithoutTournamentsNestedInput
+    fights?: FightUncheckedUpdateManyWithoutTournamentNestedInput
   }
 
   export type FightUpsertWithoutTournamentStepInput = {
@@ -38836,6 +39099,7 @@ export namespace Prisma {
     brute1?: BruteUpdateOneRequiredWithoutFightsNestedInput
     brute2?: BruteUpdateOneWithoutFightsAsAdversaryNestedInput
     logs?: LogUpdateManyWithoutFightNestedInput
+    tournament?: TournamentUpdateOneWithoutFightsNestedInput
   }
 
   export type FightUncheckedUpdateWithoutTournamentStepInput = {
@@ -38847,6 +39111,7 @@ export namespace Prisma {
     loser?: StringFieldUpdateOperationsInput | string
     steps?: StringFieldUpdateOperationsInput | string
     fighters?: StringFieldUpdateOperationsInput | string
+    tournamentId?: NullableIntFieldUpdateOperationsInput | number | null
     logs?: LogUncheckedUpdateManyWithoutFightNestedInput
   }
 
@@ -42165,6 +42430,7 @@ export namespace Prisma {
     loser: string
     steps: string
     fighters: string
+    tournamentId?: number | null
   }
 
   export type FightCreateManyBrute2Input = {
@@ -42175,6 +42441,7 @@ export namespace Prisma {
     loser: string
     steps: string
     fighters: string
+    tournamentId?: number | null
   }
 
   export type LogCreateManyCurrentBruteInput = {
@@ -42426,6 +42693,7 @@ export namespace Prisma {
     fighters?: StringFieldUpdateOperationsInput | string
     brute2?: BruteUpdateOneWithoutFightsAsAdversaryNestedInput
     logs?: LogUpdateManyWithoutFightNestedInput
+    tournament?: TournamentUpdateOneWithoutFightsNestedInput
     TournamentStep?: TournamentStepUpdateManyWithoutFightNestedInput
   }
 
@@ -42437,6 +42705,7 @@ export namespace Prisma {
     loser?: StringFieldUpdateOperationsInput | string
     steps?: StringFieldUpdateOperationsInput | string
     fighters?: StringFieldUpdateOperationsInput | string
+    tournamentId?: NullableIntFieldUpdateOperationsInput | number | null
     logs?: LogUncheckedUpdateManyWithoutFightNestedInput
     TournamentStep?: TournamentStepUncheckedUpdateManyWithoutFightNestedInput
   }
@@ -42449,6 +42718,7 @@ export namespace Prisma {
     loser?: StringFieldUpdateOperationsInput | string
     steps?: StringFieldUpdateOperationsInput | string
     fighters?: StringFieldUpdateOperationsInput | string
+    tournamentId?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type FightUpdateWithoutBrute2Input = {
@@ -42459,6 +42729,7 @@ export namespace Prisma {
     fighters?: StringFieldUpdateOperationsInput | string
     brute1?: BruteUpdateOneRequiredWithoutFightsNestedInput
     logs?: LogUpdateManyWithoutFightNestedInput
+    tournament?: TournamentUpdateOneWithoutFightsNestedInput
     TournamentStep?: TournamentStepUpdateManyWithoutFightNestedInput
   }
 
@@ -42470,6 +42741,7 @@ export namespace Prisma {
     loser?: StringFieldUpdateOperationsInput | string
     steps?: StringFieldUpdateOperationsInput | string
     fighters?: StringFieldUpdateOperationsInput | string
+    tournamentId?: NullableIntFieldUpdateOperationsInput | number | null
     logs?: LogUncheckedUpdateManyWithoutFightNestedInput
     TournamentStep?: TournamentStepUncheckedUpdateManyWithoutFightNestedInput
   }
@@ -42482,6 +42754,7 @@ export namespace Prisma {
     loser?: StringFieldUpdateOperationsInput | string
     steps?: StringFieldUpdateOperationsInput | string
     fighters?: StringFieldUpdateOperationsInput | string
+    tournamentId?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type LogUpdateWithoutCurrentBruteInput = {
@@ -42556,6 +42829,7 @@ export namespace Prisma {
     type?: EnumTournamentTypeFieldUpdateOperationsInput | $Enums.TournamentType
     rounds?: IntFieldUpdateOperationsInput | number
     steps?: TournamentStepUpdateManyWithoutTournamentNestedInput
+    fights?: FightUpdateManyWithoutTournamentNestedInput
   }
 
   export type TournamentUncheckedUpdateWithoutParticipantsInput = {
@@ -42564,6 +42838,7 @@ export namespace Prisma {
     type?: EnumTournamentTypeFieldUpdateOperationsInput | $Enums.TournamentType
     rounds?: IntFieldUpdateOperationsInput | number
     steps?: TournamentStepUncheckedUpdateManyWithoutTournamentNestedInput
+    fights?: FightUncheckedUpdateManyWithoutTournamentNestedInput
   }
 
   export type TournamentUncheckedUpdateManyWithoutParticipantsInput = {
@@ -43145,6 +43420,17 @@ export namespace Prisma {
     fightId: number
   }
 
+  export type FightCreateManyTournamentInput = {
+    id?: number
+    date?: Date | string
+    brute1Id: number
+    brute2Id?: number | null
+    winner: string
+    loser: string
+    steps: string
+    fighters: string
+  }
+
   export type BruteUpdateWithoutTournamentsInput = {
     name?: StringFieldUpdateOperationsInput | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -43327,6 +43613,42 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     step?: IntFieldUpdateOperationsInput | number
     fightId?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type FightUpdateWithoutTournamentInput = {
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    winner?: StringFieldUpdateOperationsInput | string
+    loser?: StringFieldUpdateOperationsInput | string
+    steps?: StringFieldUpdateOperationsInput | string
+    fighters?: StringFieldUpdateOperationsInput | string
+    brute1?: BruteUpdateOneRequiredWithoutFightsNestedInput
+    brute2?: BruteUpdateOneWithoutFightsAsAdversaryNestedInput
+    logs?: LogUpdateManyWithoutFightNestedInput
+    TournamentStep?: TournamentStepUpdateManyWithoutFightNestedInput
+  }
+
+  export type FightUncheckedUpdateWithoutTournamentInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    brute1Id?: IntFieldUpdateOperationsInput | number
+    brute2Id?: NullableIntFieldUpdateOperationsInput | number | null
+    winner?: StringFieldUpdateOperationsInput | string
+    loser?: StringFieldUpdateOperationsInput | string
+    steps?: StringFieldUpdateOperationsInput | string
+    fighters?: StringFieldUpdateOperationsInput | string
+    logs?: LogUncheckedUpdateManyWithoutFightNestedInput
+    TournamentStep?: TournamentStepUncheckedUpdateManyWithoutFightNestedInput
+  }
+
+  export type FightUncheckedUpdateManyWithoutTournamentInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    brute1Id?: IntFieldUpdateOperationsInput | number
+    brute2Id?: NullableIntFieldUpdateOperationsInput | number | null
+    winner?: StringFieldUpdateOperationsInput | string
+    loser?: StringFieldUpdateOperationsInput | string
+    steps?: StringFieldUpdateOperationsInput | string
+    fighters?: StringFieldUpdateOperationsInput | string
   }
 
   export type BruteUpdateWithoutTitlesInput = {

@@ -2,6 +2,91 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.50.4](https://github.com/Zenoo/labrute/compare/labrute-v2.50.3...labrute-v2.50.4) (2024-04-26)
+
+
+### Bug Fixes
+
+* Unused dep ([16d5232](https://github.com/Zenoo/labrute/commit/16d5232c4b4681d348b29ac614b88cb017478c9e))
+
+## [2.50.3](https://github.com/Zenoo/labrute/compare/labrute-v2.50.2...labrute-v2.50.3) (2024-04-26)
+
+
+### Bug Fixes
+
+* Update xp after fights ([229dbc9](https://github.com/Zenoo/labrute/commit/229dbc93e261a45e6a7e0a07c037ea9e9ed767a9))
+
+## [2.50.2](https://github.com/Zenoo/labrute/compare/labrute-v2.50.1...labrute-v2.50.2) (2024-04-25)
+
+
+### Bug Fixes
+
+* Data update without hook refresh ([7d7d0b0](https://github.com/Zenoo/labrute/commit/7d7d0b0633edd367100aa42021d965a77f76097f))
+
+## [2.50.1](https://github.com/Zenoo/labrute/compare/labrute-v2.50.0...labrute-v2.50.1) (2024-04-25)
+
+
+### Bug Fixes
+
+* Store server ready state in memory. Fixes [#634](https://github.com/Zenoo/labrute/issues/634) ([c5cd530](https://github.com/Zenoo/labrute/commit/c5cd5304a3f9db381e34857a195ac7285f14be9c))
+
+## [2.50.0](https://github.com/Zenoo/labrute/compare/labrute-v2.49.18...labrute-v2.50.0) (2024-04-25)
+
+
+### Features
+
+* Update to Eternaltwin 0.14 ([f30b71b](https://github.com/Zenoo/labrute/commit/f30b71b3f5584628a7882fef907aebeb3f323758))
+
+
+### Bug Fixes
+
+* Reduce network requests. Fixes [#624](https://github.com/Zenoo/labrute/issues/624) ([607cc3f](https://github.com/Zenoo/labrute/commit/607cc3fbcba5110128a625b28539325e1c4785cd))
+
+## [2.49.18](https://github.com/Zenoo/labrute/compare/labrute-v2.49.17...labrute-v2.49.18) (2024-04-24)
+
+
+### Bug Fixes
+
+* Code dupe ([e6a26bd](https://github.com/Zenoo/labrute/commit/e6a26bd59f077342ca94ae6aef17433f5c1c8843))
+
+## [2.49.17](https://github.com/Zenoo/labrute/compare/labrute-v2.49.16...labrute-v2.49.17) (2024-04-24)
+
+
+### Bug Fixes
+
+* Listen to both unlock events ([b61a05b](https://github.com/Zenoo/labrute/commit/b61a05b5f62a9c25f8f077fc07ce955d017c2c04))
+
+## [2.49.16](https://github.com/Zenoo/labrute/compare/labrute-v2.49.15...labrute-v2.49.16) (2024-04-24)
+
+
+### Bug Fixes
+
+* Lock reset event ([0a0e006](https://github.com/Zenoo/labrute/commit/0a0e006b985053c182f0db0c0b171e912beb3cd7))
+
+## [2.49.15](https://github.com/Zenoo/labrute/compare/labrute-v2.49.14...labrute-v2.49.15) (2024-04-24)
+
+
+### Bug Fixes
+
+* Timeout locks after 60secs ([6abb604](https://github.com/Zenoo/labrute/commit/6abb604a1d22acb4045db99187aaeae1e0edd10c))
+
+## [2.49.14](https://github.com/Zenoo/labrute/compare/labrute-v2.49.13...labrute-v2.49.14) (2024-04-23)
+
+
+### Bug Fixes
+
+* Hypnotised pet wrong targets. Fixes [#619](https://github.com/Zenoo/labrute/issues/619) ([81da92c](https://github.com/Zenoo/labrute/commit/81da92cfa94483afa6c45d5dfe5868077d4d0dcb))
+* Tournament history perfs. Fixes [#617](https://github.com/Zenoo/labrute/issues/617) ([3669999](https://github.com/Zenoo/labrute/commit/3669999174139c036bd06ace75c75cb31f24c85e))
+
+## [2.49.13](https://github.com/Zenoo/labrute/compare/labrute-v2.49.12...labrute-v2.49.13) (2024-04-23)
+
+
+### Bug Fixes
+
+* Cell swipe sensitivity ([f4c9eeb](https://github.com/Zenoo/labrute/commit/f4c9eeb5d25de969bda3a96168247ddf0f1deb43))
+* Disarm not working 1/101 of the time ([fd02682](https://github.com/Zenoo/labrute/commit/fd0268209ba1236095e1c22fa5f764ca617c42f7))
+* prevent race condition ([#623](https://github.com/Zenoo/labrute/issues/623)) ([4673b62](https://github.com/Zenoo/labrute/commit/4673b6209318d3ed49de727d4ce5da793eb7d2a0))
+
 ## [2.49.12](https://github.com/Zenoo/labrute/compare/labrute-v2.49.11...labrute-v2.49.12) (2024-04-12)
 
 

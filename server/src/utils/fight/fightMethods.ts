@@ -200,14 +200,12 @@ export const getOpponents = (
   // Fighter is a pet/backup
   if (fighter.master) {
     opponents = opponents.filter((f) => (f.master
-      ? (f.hypnotised ? f.master === fighter.master : f.master !== fighter.master)
+      ? f.master !== fighter.master
       : f.id !== fighter.master));
   } else {
     // Fighter is a real brute
     opponents = opponents.filter((f) => (f.master
-      ? f.hypnotised
-        ? f.master === fighter.id
-        : f.master !== fighter.id
+      ? f.master !== fighter.id
       : f.id !== fighter.id));
   }
 
@@ -466,7 +464,7 @@ const activateSuper = (
       if (!opponent.activeWeapon) return false;
 
       // 20% chance to steal
-      if (randomBetween(0, 4) === 0) {
+      if (randomBetween(1, 5) === 1) {
         // Remove own weapon
         if (fighter.activeWeapon) {
           // Add trash step
@@ -591,7 +589,7 @@ const activateSuper = (
     case 'hammer': {
       // Only 20% to use the skill if fighter has a weapon
       if (fighter.activeWeapon) {
-        if (randomBetween(0, 4) === 0) {
+        if (randomBetween(1, 5) === 1) {
           // Add trash step
           fightData.steps.push({
             action: 'trash',
@@ -1012,14 +1010,14 @@ const breakShield = (fighter: DetailedFighter, opponent: DetailedFighter) => {
   // Can't break someone's shield if they are not holding a shield >.>
   if (!opponent.shield) return false;
 
-  return getFighterStat(fighter, 'disarm') * 100 > randomBetween(0, 300);
+  return getFighterStat(fighter, 'disarm') * 100 >= randomBetween(0, 300);
 };
 
 const disarm = (fighter: DetailedFighter, opponent: DetailedFighter) => {
   // Can't disarm someone if they are not holding a weapon >.>
   if (!opponent.activeWeapon) return false;
 
-  return getFighterStat(fighter, 'disarm') * 100 > randomBetween(0, 100);
+  return getFighterStat(fighter, 'disarm') * 100 >= randomBetween(0, 100);
 };
 
 const disarmAttacker = (fighter: DetailedFighter, opponent: DetailedFighter) => {
@@ -1221,14 +1219,10 @@ export const checkDeaths = (
           throw new Error('Pet without master');
         }
 
-        if (fighter.hypnotised) {
-          updateStats(stats, master, 'petsKilled', 1);
-        } else {
-          const opponent = fightData.fighters.find((f) => f.id !== master && !f.master);
+        const opponent = fightData.fighters.find((f) => f.id !== master && !f.master);
 
-          if (opponent) {
-            updateStats(stats, opponent.id, 'petsKilled', 1);
-          }
+        if (opponent) {
+          updateStats(stats, opponent.id, 'petsKilled', 1);
         }
       }
 

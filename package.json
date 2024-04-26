@@ -1,6 +1,6 @@
 {
   "name": "labrute",
-  "version": "2.49.12",
+  "version": "2.50.4",
   "private": true,
   "engines": {
     "npm": ">=8.1.2",
@@ -11,7 +11,8 @@
     "compile": "tsc -b tsconfig.build.json",
     "front": "cd ./client && yarn start",
     "back": "cd ./server && yarn start:watch",
-    "etwin": "etwin",
+    "eternaltwin": "eternaltwin",
+    "eternaltwin:start": "eternaltwin start",
     "start": "cd ./server && yarn start",
     "dev": "concurrently --prefix \"[{name}]\" --names \"DB,SERVER,CLIENT\" -c \"bgMagenta.bold,bgBlue.bold,bgGreen.bold,bgYellow.bold\" \"yarn run studio\" \"yarn run back\" \"yarn run front\"",
     "build": "yarn compile && yarn build:client",
@@ -33,6 +34,7 @@
     "run:fixErroredBonuses": "cd server && yarn run:fixErroredBonuses"
   },
   "devDependencies": {
+    "@eternaltwin/cli": "^0.14.2",
     "@types/node": "^18.11.15",
     "concurrently": "^7.6.0",
     "rimraf": "^3.0.2",

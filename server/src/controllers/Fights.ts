@@ -58,7 +58,7 @@ const Fights = {
   },
   create: (prisma: PrismaClient) => async (
     req: Request<never, unknown, { brute1: string, brute2: string }>,
-    res: Response,
+    res: Response<FightCreateResponse>,
   ) => {
     try {
       const user = await auth(prisma, req);
@@ -68,8 +68,13 @@ const Fights = {
 
       const fight = await doFight(prisma, user, req.body.brute1, req.body.brute2);
 
-      // Send fight id to client
-      res.send({ id: fight.id });
+      res.send({
+        id: fight.id,
+        xpWon: arenaFight ? xpGained : 0,
+        fightsLeft: getFightsLeft(brute1) - 1,
+        victories: arenaFight ? generatedFight.winner === brute1.name ? 1 : 0 : 0,
+      });
+
     } catch (error) {
       sendError(res, error);
     }

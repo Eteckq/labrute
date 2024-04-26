@@ -257,7 +257,10 @@ model Fight {
   steps          String           @db.Text
   fighters       String           @db.Text
   logs           Log[]
+  tournament     Tournament?      @relation(fields: [tournamentId], references: [id])
+  tournamentId   Int?
   TournamentStep TournamentStep[]
+  @@index([tournamentId, winner, brute1Id, brute2Id])
 }
 
 // LOGS
@@ -330,6 +333,7 @@ model Tournament {
   participants Brute[]
   steps        TournamentStep[]
   rounds       Int
+  fights       Fight[]
   @@index([type, date])
 }
 
@@ -528,7 +532,6 @@ model BruteReport {
 // SERVER STATE
 model ServerState {
   id                    Int     @id @default(autoincrement())
-  ready                 Boolean @default(true)
   globalTournamentValid Boolean @default(true)
 }
 

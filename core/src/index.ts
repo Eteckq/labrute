@@ -16,6 +16,7 @@ import getRandomBody from './brute/getRandomBody';
 import getRandomBonus from './brute/getRandomBonus';
 import getRandomColors from './brute/getRandomColors';
 import getXPNeeded from './brute/getXPNeeded';
+import { isNameValid } from './brute/isNameValid';
 import skills from './brute/skills';
 import updateBruteData from './brute/updateBruteData';
 import weapons from './brute/weapons';
@@ -28,7 +29,6 @@ import pad from './utils/pad';
 import promiseBatch from './utils/promiseBatch';
 import randomBetween from './utils/randomBetween';
 import weightedRandom from './utils/weightedRandom';
-import { isNameValid } from './brute/isNameValid';
 
 export * from './Achievements';
 export * from './Titles';
@@ -46,10 +46,9 @@ export {
   getMaxFightsPerDay,
   getRandomBody,
   getRandomBonus,
-  getRandomColors, getXPNeeded, hexToRgba,
-  pad, promiseBatch, randomBetween, skills,
+  getRandomColors, getXPNeeded, hexToRgba, isNameValid, pad, promiseBatch, randomBetween, skills,
   updateBruteData, weapons,
-  weightedRandom, isNameValid,
+  weightedRandom
 };
 
 export const DEFAULT_LANGUAGE = Lang.en;
@@ -128,7 +127,7 @@ export type TournamentHistoryResponse = (Pick<
   'type' |
   'rounds'
 > & {
-  steps: Pick<TournamentStep, 'step'>[],
+  place: number,
 })[];
 
 export type ClanListResponse = (Clan & {
@@ -184,3 +183,18 @@ export type AchievementGetRankingsResponse = {
   brute: Pick<Brute, 'name' | 'id'> | null,
   count: number,
 }[];
+
+export type AchievementsGetResponse = {
+  name: AchievementName,
+  count: number,
+}[];
+
+export type FightCreateResponse = {
+  id: number,
+  fightsLeft: number,
+  xpWon: number,
+  victories: number,
+};
+export type ClanChallengeBossResponse = {
+  id: number,
+};

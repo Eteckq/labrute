@@ -11,6 +11,7 @@ import Env from './utils/Env.js';
 import startJob from './workers/startJob.js';
 import { GLOBAL, ServerContext } from './context.js';
 import lockMiddleware from './utils/middlewares/locks.js';
+import { readyCheck } from './utils/middlewares/readyCheck.js';
 
 async function main(cx: ServerContext) {
   cx.logger.info(`Server started (v${Version})`);
@@ -25,9 +26,10 @@ async function main(cx: ServerContext) {
     }),
   );
   app.use(lockMiddleware);
+  app.use(readyCheck);
 
   app.listen(port, () => {
-    cx.logger.info('Server listening');
+    cx.logger.info(`Server listening on port ${port}`);
 
     // Trigger daily job
     dailyJob(cx.prisma)().catch((error: Error) => {
