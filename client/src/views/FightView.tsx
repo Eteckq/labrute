@@ -52,17 +52,18 @@ const FightView = () => {
   return (bruteName && fightId) ? (
     <Page title={`${bruteName || ''} ${t('MyBrute')}`} headerUrl={`/${bruteName}/cell`}>
       <BoxBg
-        src="/images/fight/background.gif"
+        src="/images/versus/background.gif"
         sx={{
           width: 930,
           height: 460,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
         }}
       >
-        <Box display="flex">
-          {/* FIGHT */}
-          <Box sx={{ ml: 5, alignSelf: 'center' }}>
-            <FightComponent fight={fight} />
-          </Box>
+        {/* FIGHT */}
+        <Box sx={{ ml: -4, alignSelf: 'center' }}>
+          <FightComponent fight={fight} />
         </Box>
       </BoxBg>
     </Page>
