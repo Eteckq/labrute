@@ -35,7 +35,7 @@ const Logs = {
           { date: 'desc' },
           { id: 'desc' },
         ],
-        take: 7,
+        take: 10,
         include: {
           currentBrute: {
             select: { name: true },

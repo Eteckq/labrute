@@ -7,7 +7,6 @@ import { Box, Fab, Paper, Tooltip, useMediaQuery } from '@mui/material';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
-import CellClan from '../components/Cell/CellClan';
 import CellLog from '../components/Cell/CellLog';
 import CellMain from '../components/Cell/CellMain';
 import CellPets from '../components/Cell/CellPets';
@@ -290,24 +289,6 @@ const CellView = () => {
               mt: -7,
             }}
             >
-              {/* REF LINK */}
-              <Tooltip title={t('refLink')}>
-                <Paper sx={{
-                  p: 1,
-                  mr: 0,
-                  ml: 4,
-                  bgcolor: 'background.paperAccent',
-                  textAlign: 'center',
-                }}
-                >
-                  <Text bold sx={{ wordBreak: 'break-word' }}>{`${window.location.origin}?ref=${bruteName || ''}`}</Text>
-                </Paper>
-              </Tooltip>
-
-              {/* CLAN */}
-              {(ownsBrute || !!brute.clanId) && (
-                <CellClan brute={brute} sx={{ ml: 4 }} />
-              )}
               {/* LOGS */}
               <Box sx={{ ml: 2, mt: 1 }}>
                 {logs.map((log) => <CellLog key={log.id} log={log} />)}
