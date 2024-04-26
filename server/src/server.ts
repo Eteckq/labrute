@@ -5,6 +5,7 @@ import bodyParser from 'body-parser';
 import schedule from 'node-schedule';
 import dailyJob from './dailyJob.js';
 import './i18n.js';
+import initBot from './bot/index.js';
 import initRoutes from './routes.js';
 import Env from './utils/Env.js';
 import startJob from './workers/startJob.js';
@@ -12,7 +13,7 @@ import { GLOBAL, ServerContext } from './context.js';
 import lockMiddleware from './utils/middlewares/locks.js';
 import { readyCheck } from './utils/middlewares/readyCheck.js';
 
-function main(cx: ServerContext) {
+async function main(cx: ServerContext) {
   cx.logger.info(`Server started (v${Version})`);
 
   const app = express();
@@ -45,6 +46,9 @@ function main(cx: ServerContext) {
   });
 
   initRoutes(app, cx.prisma);
+
+  cx.logger.info('Init discord bot');
+  await initBot(cx.prisma);
 }
 
 /**

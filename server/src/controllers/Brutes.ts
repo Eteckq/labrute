@@ -219,28 +219,6 @@ const Brutes = {
         throw new ExpectedError(translate('nameAlreadyTaken', user));
       }
 
-      let goldLost = 0;
-      let newLimit = user.bruteLimit;
-      // Refuse if user has too many brutes and not enough gold
-      if (user.brutes.length >= user.bruteLimit) {
-        const gold = getGoldNeededForNewBrute(user);
-        if (user.gold < gold) {
-          throw new ExpectedError(translate('bruteLimitReached', user, { gold }));
-        } else {
-          // Remove XXX Gold and update brute limit
-          await prisma.user.update({
-            where: { id: user.id },
-            data: {
-              gold: { decrement: gold },
-              bruteLimit: { increment: 1 },
-            },
-            select: { id: true },
-          });
-          goldLost = gold;
-          newLimit += 1;
-        }
-      }
-
       const master = req.body.master ? await prisma.brute.findFirst({
         where: {
           name: req.body.master,
@@ -310,7 +288,7 @@ const Brutes = {
       // Update achievements
       await checkLevelUpAchievements(prisma, brute, destinyChoice);
 
-      res.send({ brute, goldLost, newLimit });
+      res.send({ brute, goldLost: 0, newLimit: 1 });
     } catch (error) {
       sendError(res, error);
     }
@@ -439,10 +417,6 @@ const Brutes = {
 
       if (!freshBrute) {
         throw new Error(translate('bruteNotFound', user));
-      }
-
-      if (freshBrute.xp !== brute.xp) {
-        throw new ExpectedError(translate('slowDown', user));
       }
 
       // Update brute

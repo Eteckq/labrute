@@ -1,26 +1,29 @@
-import { AuthType } from '@eternaltwin/core/auth/auth-type';
-import { EternaltwinNodeClient } from '@eternaltwin/client-node';
-import { RfcOauthClient } from '@eternaltwin/oauth-client-http/rfc-oauth-client';
 import { PrismaClient } from '@labrute/prisma';
 import { Request, Response } from 'express';
 import { ExpectedError } from '@labrute/core';
-import urlJoin from 'url-join';
+import {
+  OAuth2Routes, RESTPostOAuth2AccessTokenResult, RouteBases, RESTGetAPIUserResult,
+} from 'discord.js';
+import fetch from 'node-fetch';
 import Env from '../utils/Env.js';
 import sendError from '../utils/sendError.js';
 
-const oauthClient = new RfcOauthClient({
-  authorizationEndpoint: new URL(urlJoin(Env.ETWIN_URL, 'oauth/authorize')),
-  tokenEndpoint: new URL(urlJoin(Env.ETWIN_URL, 'oauth/token')),
-  callbackEndpoint: new URL(urlJoin(Env.SELF_URL, 'oauth/callback')),
-  clientId: Env.ETWIN_CLIENT_ID,
-  clientSecret: Env.ETWIN_CLIENT_SECRET,
-});
+async function getToken(code: string) {
+  const data_1 = new URLSearchParams();
+  data_1.append('client_id', Env.DISCORD_CLIENT_ID);
+  data_1.append('client_secret', Env.DISCORD_CLIENT_SECRET);
+  data_1.append('grant_type', 'authorization_code');
+  data_1.append('redirect_uri', Env.SELF_URL);
+  data_1.append('scope', 'identify');
+  data_1.append('code', code);
+  return fetch(OAuth2Routes.tokenURL, { method: 'POST', body: data_1 }).then((res) => res.json() as Promise<RESTPostOAuth2AccessTokenResult>);
+}
 
 const OAuth = {
   redirect: (req: Request, res: Response) => {
     try {
       res.send({
-        url: oauthClient.getAuthorizationUri('base', ''),
+        url: `${OAuth2Routes.authorizationURL}?client_id=1232306145582911528&response_type=code&redirect_uri=${Env.SELF_URL}&scope=identify`,
       });
     } catch (error) {
       sendError(res, error);
@@ -31,42 +34,31 @@ const OAuth = {
       if (!req.query.code || typeof req.query.code !== 'string') {
         throw new ExpectedError('Invalid code');
       }
-
-      // ETwin Token
-      const token = await oauthClient.getAccessToken(req.query.code);
-
-      // ETWin User
-      const etwinClient = new EternaltwinNodeClient(new URL(Env.ETWIN_URL));
-      const self = await etwinClient.getAuthSelf({auth: token.accessToken});
-
-      if (self.type !== AuthType.AccessToken) {
-        throw new Error('Invalid auth type');
-      }
-
-      // Update or store user
-      const { user: etwinUser } = self;
+      const resToken = await getToken(req.query.code);
+      const discordUser: RESTGetAPIUserResult = await fetch(`${RouteBases.api}/users/@me`, { headers: { authorization: `Bearer ${resToken.access_token}` } }).then((r) => r.json() as Promise<RESTGetAPIUserResult>);
 
       const existingUser = await prisma.user.findFirst({
-        where: { id: etwinUser.id },
+        where: { id: discordUser.id },
       });
 
       // If user does not exist, create it
       if (!existingUser) {
+        const usersCount = await prisma.user.count();
         await prisma.user.create({
           data: {
-            id: etwinUser.id,
-            connexionToken: token.accessToken,
-            name: etwinUser.displayName.current.value,
+            id: discordUser.id,
+            connexionToken: resToken.access_token,
+            name: discordUser.username,
+            admin: usersCount === 0,
           },
           select: { id: true },
         });
       } else {
         // If user exists, update it
         await prisma.user.update({
-          where: { id: etwinUser.id },
+          where: { id: discordUser.id },
           data: {
-            name: etwinUser.displayName.current.value,
-            connexionToken: token.accessToken,
+            connexionToken: resToken.access_token,
           },
           select: { id: true },
         });
@@ -74,7 +66,7 @@ const OAuth = {
 
       // Fetch user data
       const user = await prisma.user.findFirst({
-        where: { id: etwinUser.id, connexionToken: token.accessToken },
+        where: { id: discordUser.id, connexionToken: resToken.access_token },
         include: {
           brutes: {
             where: { deletedAt: null },
