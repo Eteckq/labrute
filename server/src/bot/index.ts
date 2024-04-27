@@ -19,7 +19,7 @@ import {
   EmbedBuilder,
 } from 'discord.js';
 import { PrismaClient } from '@labrute/prisma';
-import { ExpectedError, canLevelUp } from '@labrute/core';
+import { ExpectedError, WIN_XP, canLevelUp } from '@labrute/core';
 import Env from '../utils/Env.js';
 import getOpponents from '../utils/brute/getOpponents.js';
 import { doFight } from '../services/fights.js';
@@ -117,27 +117,7 @@ export default async (prisma: PrismaClient) => {
               filter: collectorFilter,
               time: 60_000,
             });
-            const fightLeft = `Il te reste encore ${brute.fightsLeft - 1} combat${
-              brute.fightsLeft - 1 > 1 ? 's' : ''
-            }`;
-            const levelupEmbed = new EmbedBuilder()
-              .setColor(0xff00ff)
-              .setTitle(
-                'Level up!',
-              )
-              .setURL(
-                `${Env.SELF_URL}/${brute.name}/level-up`,
-              );
 
-            await interaction.editReply({
-              content: `Combat lancé. ${
-                brute.fightsLeft - 1 > 0
-                  ? fightLeft
-                  : 'Tu as terminé tes combats. Reviens demain!'
-              }`,
-              embeds: canLevelUp(brute) ? [levelupEmbed] : [],
-              components: [],
-            });
             try {
               const targetBrute = await prisma.brute.findFirst({
                 where: {
@@ -156,6 +136,39 @@ export default async (prisma: PrismaClient) => {
                 brute.name,
                 confirmation.customId,
               );
+              const updatedBrute = await prisma.brute.findFirst({
+                where: {
+                  user,
+                },
+                select: {
+                  xp: true,
+                  level: true,
+                  fightsLeft: true,
+                },
+              });
+              if (updatedBrute) {
+                if (canLevelUp(updatedBrute)) {
+                  const levelupEmbed = new EmbedBuilder()
+                    .setColor(0xff00ff)
+                    .setTitle('Level up!')
+                    .setURL(`${Env.SELF_URL}/${brute.name}/level-up`);
+                  await interaction.editReply({
+                    embeds: [levelupEmbed],
+                  });
+                }
+                const fightLeft = `Il te reste encore ${
+                  updatedBrute.fightsLeft
+                } combat${updatedBrute.fightsLeft > 1 ? 's' : ''}`;
+
+                await interaction.editReply({
+                  content: `Combat lancé. ${
+                    updatedBrute.fightsLeft > 0
+                      ? fightLeft
+                      : 'Tu as terminé tes combats. Reviens demain!'
+                  }`,
+                  components: [],
+                });
+              }
 
               const FightEmbed = new EmbedBuilder()
                 .setColor(0xff0000)
