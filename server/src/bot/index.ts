@@ -4,24 +4,15 @@ import {
   Routes,
   Client,
   GatewayIntentBits,
-  ModalBuilder,
   ActionRowBuilder,
-  TextInputBuilder,
-  TextInputStyle,
   Events,
-  SelectMenuOptionBuilder,
   ButtonBuilder,
   ButtonStyle,
-  ComponentType,
-  ChatInputCommandInteraction,
-  CacheType,
-  ButtonInteraction,
   EmbedBuilder,
 } from 'discord.js';
 import { PrismaClient } from '@labrute/prisma';
-import { ExpectedError, WIN_XP, canLevelUp } from '@labrute/core';
+import { canLevelUp, getLevelUpChoices } from '@labrute/core';
 import Env from '../utils/Env.js';
-import getOpponents from '../utils/brute/getOpponents.js';
 import { doFight } from '../services/fights.js';
 
 const commands = [
@@ -144,6 +135,10 @@ export default async (prisma: PrismaClient) => {
                   xp: true,
                   level: true,
                   fightsLeft: true,
+                  id: true,
+                  pets: true,
+                  skills: true,
+                  weapons: true,
                 },
               });
               if (updatedBrute) {
@@ -152,6 +147,9 @@ export default async (prisma: PrismaClient) => {
                     .setColor(0xff00ff)
                     .setTitle('Level up!')
                     .setURL(`${Env.SELF_URL}/${brute.name}/level-up`);
+                  // const choices = getLevelUpChoices(updatedBrute);
+                  // console.log(choices);
+
                   await interaction.editReply({
                     embeds: [levelupEmbed],
                   });
