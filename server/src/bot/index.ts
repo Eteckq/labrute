@@ -82,143 +82,150 @@ export default async (prisma: PrismaClient) => {
           });
         } else {
           const components = [];
-          for (const opponent of brute.opponents) {
-            const pseudo = opponent.user ? opponent.user.name : 'bot';
-            components.push(
-              new ButtonBuilder()
-                .setCustomId(opponent.name)
-                .setLabel(`${opponent.name} (${pseudo}) - lv${opponent.level}`)
-                .setStyle(
-                  opponent.user ? ButtonStyle.Primary : ButtonStyle.Secondary,
-                ),
-            );
-          }
+          if (brute.opponents.length === 0) {
+            await interaction.reply({
+              content: 'Aucun adversaires dicponibles',
+              ephemeral: true,
+            });
+          } else {
+            for (const opponent of brute.opponents) {
+              const pseudo = opponent.user ? opponent.user.name : 'bot';
+              components.push(
+                new ButtonBuilder()
+                  .setCustomId(opponent.name)
+                  .setLabel(`${opponent.name} (${pseudo}) - lv${opponent.level}`)
+                  .setStyle(
+                    opponent.user ? ButtonStyle.Primary : ButtonStyle.Secondary,
+                  ),
+              );
+            }
 
-          const row: any = new ActionRowBuilder().addComponents(...components);
+            const row: any = new ActionRowBuilder().addComponents(...components);
 
-          const response = await interaction.reply({
-            content: 'Choisis ton adreversaire',
-            components: [row],
-            ephemeral: true,
-          });
-
-          const collectorFilter = (i: any) => i.user.id === interaction.user.id;
-          try {
-            const confirmation = await response.awaitMessageComponent({
-              filter: collectorFilter,
-              time: 60_000,
+            const response = await interaction.reply({
+              content: 'Choisis ton adreversaire',
+              components: [row],
+              ephemeral: true,
             });
 
+            const collectorFilter = (i: any) => i.user.id === interaction.user.id;
             try {
-              const targetBrute = await prisma.brute.findFirst({
-                where: {
-                  name: confirmation.customId,
-                },
-                select: {
-                  user: true,
-                  name: true,
-                  level: true,
-                },
+              const confirmation = await response.awaitMessageComponent({
+                filter: collectorFilter,
+                time: 60_000,
               });
 
-              const fight = await doFight(
-                prisma,
-                user,
-                brute.name,
-                confirmation.customId,
-              );
-              const updatedBrute = await prisma.brute.findFirst({
-                where: {
+              try {
+                const targetBrute = await prisma.brute.findFirst({
+                  where: {
+                    name: confirmation.customId,
+                  },
+                  select: {
+                    user: true,
+                    name: true,
+                    level: true,
+                  },
+                });
+
+                const fight = await doFight(
+                  prisma,
                   user,
-                },
-                select: {
-                  xp: true,
-                  level: true,
-                  fightsLeft: true,
-                  id: true,
-                  pets: true,
-                  skills: true,
-                  weapons: true,
-                },
-              });
-              if (updatedBrute) {
-                if (canLevelUp(updatedBrute)) {
-                  const levelupEmbed = new EmbedBuilder()
-                    .setColor(0xff00ff)
-                    .setTitle('Level up!')
-                    .setURL(`${Env.SELF_URL}/${brute.name}/level-up`);
-                  // const choices = getLevelUpChoices(updatedBrute);
-                  // console.log(choices);
+                  brute.name,
+                  confirmation.customId,
+                );
+                const updatedBrute = await prisma.brute.findFirst({
+                  where: {
+                    user,
+                  },
+                  select: {
+                    xp: true,
+                    level: true,
+                    fightsLeft: true,
+                    id: true,
+                    pets: true,
+                    skills: true,
+                    weapons: true,
+                  },
+                });
+                if (updatedBrute) {
+                  if (canLevelUp(updatedBrute)) {
+                    const levelupEmbed = new EmbedBuilder()
+                      .setColor(0xff00ff)
+                      .setTitle('Level up!')
+                      .setURL(`${Env.SELF_URL}/${brute.name}/level-up`);
+                    // const choices = getLevelUpChoices(updatedBrute);
+                    // console.log(choices);
+
+                    await interaction.editReply({
+                      embeds: [levelupEmbed],
+                    });
+                  }
+                  const fightLeft = `Il te reste encore ${
+                    updatedBrute.fightsLeft
+                  } combat${updatedBrute.fightsLeft > 1 ? 's' : ''}`;
 
                   await interaction.editReply({
-                    embeds: [levelupEmbed],
+                    content: `Combat lancé. ${
+                      updatedBrute.fightsLeft > 0
+                        ? fightLeft
+                        : 'Tu as terminé tes combats. Reviens demain!'
+                    }`,
+                    components: [],
                   });
                 }
-                const fightLeft = `Il te reste encore ${
-                  updatedBrute.fightsLeft
-                } combat${updatedBrute.fightsLeft > 1 ? 's' : ''}`;
 
-                await interaction.editReply({
-                  content: `Combat lancé. ${
-                    updatedBrute.fightsLeft > 0
-                      ? fightLeft
-                      : 'Tu as terminé tes combats. Reviens demain!'
-                  }`,
-                  components: [],
-                });
+                const FightEmbed = new EmbedBuilder()
+                  .setColor(0xff0000)
+                  .setTitle(`${brute.name} VS ${targetBrute?.name}`)
+                  .setURL(`${Env.SELF_URL}/${brute.name}/fight/${fight.id}`)
+                  .addFields({ name: '\u200b', value: '\u200b' })
+                  .addFields(
+                    {
+                      name: `${brute.name} - lv${brute.level}`,
+                      value: `<@${user.id}>`,
+                      inline: true,
+                    },
+                    {
+                      name: 'VS',
+                      value: '\u200b',
+                      inline: true,
+                    },
+                    {
+                      value: `${
+                        targetBrute?.user ? `<@${targetBrute.user.id}>` : 'BOT'
+                      }`,
+                      name: `${targetBrute?.name} - lv${targetBrute?.level}`,
+                      inline: true,
+                    },
+                    { name: '\u200b', value: '\u200b' },
+                    {
+                      name: 'Résultat',
+                      value: `|| **${fight.winner}** ~~${fight.loser}~~ ||`,
+                    },
+                  )
+                  .setThumbnail(`${Env.SELF_URL}/images/versus/vs.png`)
+                  .setTimestamp();
+
+                await confirmation.reply({ embeds: [FightEmbed] });
+              } catch (error: unknown) {
+                if (error instanceof Error) {
+                  await confirmation.update({
+                    content: error.message,
+                    components: [],
+                  });
+                } else {
+                  await confirmation.update({
+                    content: 'Unknow error',
+                    components: [],
+                  });
+                }
               }
-
-              const FightEmbed = new EmbedBuilder()
-                .setColor(0xff0000)
-                .setTitle(`${brute.name} VS ${targetBrute?.name}`)
-                .setURL(`${Env.SELF_URL}/${brute.name}/fight/${fight.id}`)
-                .addFields({ name: '\u200b', value: '\u200b' })
-                .addFields(
-                  {
-                    name: `${brute.name} - lv${brute.level}`,
-                    value: `<@${user.id}>`,
-                    inline: true,
-                  },
-                  {
-                    name: 'VS',
-                    value: '\u200b',
-                    inline: true,
-                  },
-                  {
-                    value: `${
-                      targetBrute?.user ? `<@${targetBrute.user.id}>` : 'BOT'
-                    }`,
-                    name: `${targetBrute?.name} - lv${targetBrute?.level}`,
-                    inline: true,
-                  },
-                  { name: '\u200b', value: '\u200b' },
-                  {
-                    name: 'Résultat',
-                    value: `|| **${fight.winner}** ~~${fight.loser}~~ ||`,
-                  },
-                )
-                .setThumbnail(`${Env.SELF_URL}/images/versus/vs.png`)
-                .setTimestamp();
-
-              await confirmation.reply({ embeds: [FightEmbed] });
-            } catch (error: unknown) {
-              if (error instanceof Error) {
-                await confirmation.update({
-                  content: error.message,
-                  components: [],
-                });
-              } else {
-                await confirmation.update({
-                  content: 'Unknow error',
-                  components: [],
-                });
-              }
+            } catch (e) {
+              await interaction.editReply({
+                content: 'Confirmation not received within 1 minute, cancelling',
+                components: [],
+              });
             }
-          } catch (e) {
-            await interaction.editReply({
-              content: 'Confirmation not received within 1 minute, cancelling',
-              components: [],
-            });
           }
         }
       }
