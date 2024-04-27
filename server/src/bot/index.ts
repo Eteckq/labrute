@@ -172,24 +172,25 @@ export default async (prisma: PrismaClient) => {
 
               const FightEmbed = new EmbedBuilder()
                 .setColor(0xff0000)
-                .setTitle(
-                  `${user.name} VS ${
-                    targetBrute?.user ? targetBrute.user.name : 'BOT'
-                  }`,
-                )
+                .setTitle(`${brute.name} VS ${targetBrute?.name}`)
                 .setURL(`${Env.SELF_URL}/${brute.name}/fight/${fight.id}`)
                 .addFields({ name: '\u200b', value: '\u200b' })
                 .addFields(
                   {
-                    name: user.name,
-                    value: `${brute.name} - lv${brute.level}`,
+                    name: `${brute.name} - lv${brute.level}`,
+                    value: `<@${user.id}>`,
                     inline: true,
                   },
                   {
-                    name: `${
-                      targetBrute?.user ? targetBrute.user.name : 'BOT'
+                    name: 'VS',
+                    value: '\u200b',
+                    inline: true,
+                  },
+                  {
+                    value: `${
+                      targetBrute?.user ? `<@${targetBrute.user.id}>` : 'BOT'
                     }`,
-                    value: `${targetBrute?.name} - lv${targetBrute?.level}`,
+                    name: `${targetBrute?.name} - lv${targetBrute?.level}`,
                     inline: true,
                   },
                   { name: '\u200b', value: '\u200b' },
