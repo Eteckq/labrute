@@ -79,7 +79,7 @@ export default async (prisma: PrismaClient) => {
         if (brute.fightsLeft === 0) {
           await interaction.reply({
             content: 'Tu as terminé tes combats. Reviens dans quelques heures!',
-            components: [],
+            ephemeral: true,
           });
         } else {
           const opponents = await fcGetOpponnents(prisma, user, brute.name);
