@@ -103,7 +103,7 @@ export default async (prisma: PrismaClient) => {
             const row: any = new ActionRowBuilder().addComponents(...components);
 
             const response = await interaction.reply({
-              content: 'Choisis ton adreversaire',
+              content: 'Choisis ton adversaire',
               components: [row],
               ephemeral: true,
             });
