@@ -222,7 +222,7 @@ export default async (prisma: PrismaClient) => {
               }
             } catch (e) {
               await interaction.editReply({
-                content: 'Confirmation not received within 1 minute, cancelling',
+                content: 'Aucun adversaire choisi au bout d\'une minute',
                 components: [],
               });
             }
