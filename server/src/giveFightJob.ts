@@ -4,7 +4,11 @@ import { PrismaClient } from '@labrute/prisma';
 const giveFightJob = (prisma: PrismaClient) => async () => {
   console.log('Give fights');
 
-  const brutes = await prisma.brute.findMany();
+  const brutes = await prisma.brute.findMany({
+    where: {
+      deletedAt: null,
+    },
+  });
 
   for (const brute of brutes) {
     if (brute.fightsLeft < getMaxFightsPerDay(brute)) {
