@@ -405,7 +405,7 @@
   "in": "en",
   "choiceBackground": "Arrière-plan du choix",
   "bruteIsResting": "{{brute}} se repose.",
-  "newFightsTomorrow": "{{amount}} nouveaux combats dès demain !",
+  "newFightsTomorrow": "Attends quelques heure pour rejouer !",
   "bruteIsPreparing": "{{brute}} se prépare.",
   "comeBackInAFew": "Revenez dans quelques minutes !",
   "youHaveXFightsLeft": "Il te reste {{value}} combats aujourd'hui !",
