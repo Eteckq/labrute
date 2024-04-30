@@ -77,7 +77,7 @@ export default async (prisma: PrismaClient) => {
         });
       } else if (interaction.commandName === 'fight') {
         if (brute.fightsLeft === 0) {
-          await interaction.editReply({
+          await interaction.reply({
             content: 'Tu as terminé tes combats. Reviens dans quelques heures!',
             components: [],
           });
