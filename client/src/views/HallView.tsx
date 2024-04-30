@@ -1,4 +1,4 @@
-import { BruteWithBodyColors, FightStat, MAX_FAVORITE_BRUTES, getFightsLeft } from '@labrute/core';
+import { BruteWithBodyColors, FightStat, MAX_FAVORITE_BRUTES } from '@labrute/core';
 import { Check, CrisisAlert, Stars } from '@mui/icons-material';
 import { Box, Paper, Tooltip } from '@mui/material';
 import React, { useCallback, useMemo } from 'react';
@@ -22,7 +22,7 @@ const HallView = () => {
   const Alert = useAlert();
 
   const fightsLeft = useMemo(() => user && user.brutes
-    .reduce((acc, brute) => acc + getFightsLeft(brute), 0), [user]);
+    .reduce((acc, brute) => acc + brute.fightsLeft, 0), [user]);
 
   // Go to cell page
   const goToCell = useCallback((bruteName: string) => () => {
@@ -185,7 +185,7 @@ const HallView = () => {
               </Box>
             </Box>
             {/* Fights left */}
-            <Tooltip title={t('fightsLeft', { value: getFightsLeft(brute) })}>
+            <Tooltip title={t('fightsLeft', { value: brute.fightsLeft })}>
               <Box sx={{
                 display: 'flex',
                 justifyContent: 'center',
@@ -195,7 +195,7 @@ const HallView = () => {
                 zIndex: 1,
               }}
               >
-                {new Array(getFightsLeft(brute)).fill(0).map((_, i) => (
+                {new Array(brute.fightsLeft).fill(0).map((_, i) => (
                   <CrisisAlert
                     // eslint-disable-next-line react/no-array-index-key
                     key={i}

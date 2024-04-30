@@ -1,6 +1,6 @@
 import { Brute } from '@labrute/prisma';
-import { FIGHTS_PER_DAY } from '../constants';
+import { MAX_STACK_FIGHTS } from '../constants';
 
-const getMaxFightsPerDay = (brute: Pick<Brute, 'skills'>) => (brute.skills.includes('regeneration') ? FIGHTS_PER_DAY + 2 : FIGHTS_PER_DAY);
+const getMaxFightsPerDay = (brute: Pick<Brute, 'skills'>) => (brute.skills.includes('regeneration') ? MAX_STACK_FIGHTS + 2 : MAX_STACK_FIGHTS);
 
 export default getMaxFightsPerDay;

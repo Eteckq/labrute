@@ -1,6 +1,6 @@
 import {
   ClanCreateResponse, ClanGetResponse, ClanGetThreadResponse,
-  ClanGetThreadsResponse, ClanListResponse, ExpectedError, bosses, getFightsLeft, randomBetween,
+  ClanGetThreadsResponse, ClanListResponse, ExpectedError, bosses, randomBetween,
 } from '@labrute/core';
 import { Clan, Prisma, PrismaClient } from '@labrute/prisma';
 import { Request, Response } from 'express';
@@ -897,7 +897,7 @@ const Clans = {
       }
 
       // Check if the brute has fights left
-      if (getFightsLeft(brute) <= 0) {
+      if (brute.fightsLeft <= 0) {
         throw new ExpectedError(translate('noFightsLeft', user));
       }
 
@@ -930,7 +930,7 @@ const Clans = {
         where: { id: brute.id },
         data: {
           lastFight: new Date(),
-          fightsLeft: getFightsLeft(brute) - 1,
+          fightsLeft: brute.fightsLeft - 1,
         },
         select: { id: true },
       });

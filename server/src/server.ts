@@ -11,6 +11,7 @@ import Env from './utils/Env.js';
 import startJob from './workers/startJob.js';
 import { GLOBAL, ServerContext } from './context.js';
 import lockMiddleware from './utils/middlewares/locks.js';
+import giveFightJob from './giveFightJob.js';
 
 async function main(cx: ServerContext) {
   cx.logger.info(`Server started (v${Version})`);
@@ -36,6 +37,9 @@ async function main(cx: ServerContext) {
 
     // Initialize daily scheduler
     schedule.scheduleJob('0 0 * * *', dailyJob(cx.prisma));
+
+    // Initialize add fight scheduler
+    schedule.scheduleJob('0 */3 * * *', giveFightJob(cx.prisma));
 
     // Start worker queue
     startJob(cx.prisma).catch((error: Error) => {

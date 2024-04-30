@@ -1,4 +1,4 @@
-import { BruteRanking, getFightsLeft, getMaxFightsPerDay, getXPNeeded } from '@labrute/core';
+import { BruteRanking, getXPNeeded } from '@labrute/core';
 import { InventoryItemType, Lang } from '@labrute/prisma';
 import { Box, BoxProps, Stack } from '@mui/material';
 import moment from 'moment';
@@ -43,7 +43,7 @@ const CellMain = ({
   );
 
   const fightsLeft = useMemo(
-    () => (brute ? getFightsLeft(brute) : 0),
+    () => (brute ? brute.fightsLeft : 0),
     [brute],
   );
 
@@ -104,7 +104,7 @@ const CellMain = ({
       ) : (
         <Box sx={{ textAlign: 'center' }}>
           <Text bold color="error">{t('bruteIsResting', { brute: brute.name })}</Text>
-          <Text color="error">{t('newFightsTomorrow', { amount: getMaxFightsPerDay(brute) })}</Text>
+          <Text color="error">Reviens dans quelques heures pour ton prochain combat</Text>
         </Box>
       ) : (
         <Link to={`/${brute.name}/level-up`}>

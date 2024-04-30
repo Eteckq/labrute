@@ -1,5 +1,4 @@
 import {
-  ARENA_OPPONENTS_COUNT,
   ARENA_OPPONENTS_MAX_GAP,
   AdminPanelBrute,
   BruteRestoreResponse,
@@ -16,8 +15,6 @@ import {
   canLevelUp,
   createRandomBruteStats,
   getBruteGoldValue,
-  getFightsLeft,
-  getGoldNeededForNewBrute,
   getLevelUpChoices,
   getMaxFightsPerDay,
   getXPNeeded,
@@ -1117,10 +1114,8 @@ const Brutes = {
         throw new ExpectedError('Brute not found');
       }
 
-      const fightsLeft = getFightsLeft(brute);
-
       res.send({
-        fightsLeft,
+        fightsLeft: brute.fightsLeft,
       });
     } catch (error) {
       sendError(res, error);

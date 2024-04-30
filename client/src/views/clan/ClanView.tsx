@@ -1,4 +1,4 @@
-import { BruteRanking, BruteWithBodyColors, ClanGetResponse, bosses, getFightsLeft } from '@labrute/core';
+import { BruteRanking, BruteWithBodyColors, ClanGetResponse, bosses } from '@labrute/core';
 import { HighlightOff, PlayCircleOutline } from '@mui/icons-material';
 import { Box, Paper, Table, TableBody, TableCell, TableHead, TableRow, Tooltip } from '@mui/material';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -205,7 +205,7 @@ const ClanView = () => {
     if (!clan || !brute) return;
 
     // Check if brute still has fights left
-    if (getFightsLeft(brute) <= 0) {
+    if (brute.fightsLeft <= 0) {
       Alert.open('error', t('noFightsLeft'));
       return;
     }
@@ -219,7 +219,7 @@ const ClanView = () => {
       ...data,
       brutes: data.brutes.map((b) => (b.name === brute.name ? {
         ...b,
-        fightsLeft: getFightsLeft(b) - 1,
+        fightsLeft: brute.fightsLeft - 1,
         lastFight: new Date(),
       } : b)),
     }) : null));

@@ -2,7 +2,7 @@
 /* eslint-disable no-console */
 import {
   ARENA_OPPONENTS_COUNT,
-  FIGHTS_PER_DAY,
+  MAX_STACK_FIGHTS,
   createRandomBruteStats,
   getLevelUpChoices, getRandomBody,
   getRandomColors,
@@ -39,7 +39,7 @@ const generateBrute = (
     victories: 0,
     pupilsCount: 0,
     lastFight: moment.utc().toDate(),
-    fightsLeft: FIGHTS_PER_DAY,
+    fightsLeft: MAX_STACK_FIGHTS,
     ...createRandomBruteStats(),
   };
 

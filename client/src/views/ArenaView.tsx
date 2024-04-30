@@ -1,4 +1,4 @@
-import { BrutesGetOpponentsResponse, FightStat, getFightsLeft, getXPNeeded } from '@labrute/core';
+import { BrutesGetOpponentsResponse, FightStat, getXPNeeded } from '@labrute/core';
 import { Brute } from '@labrute/prisma';
 import { Box, Button, Grid, Paper, useMediaQuery, useTheme } from '@mui/material';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -34,7 +34,7 @@ const ArenaView = () => {
   const xpNeededForNextLevel = useMemo(() => brute
     && getXPNeeded(brute.level + 1), [brute]);
 
-  const fightsLeft = useMemo(() => (brute && getFightsLeft(brute)) ?? 0, [brute]);
+  const fightsLeft = useMemo(() => (brute && brute.fightsLeft) ?? 0, [brute]);
 
   // Fetch random opponents
   useEffect(() => {
@@ -103,7 +103,7 @@ const ArenaView = () => {
       }}
       >
         <Text h3 bold upperCase typo="handwritten" sx={{ mr: 2 }}>{t('arena')}</Text>
-        <Text bold color="secondary">{fightsLeft > 1 ? t('youHaveXFightsLeft', { value: getFightsLeft(brute) }) : t('youHaveOneFightLeft')}</Text>
+        <Text bold color="secondary">{fightsLeft > 1 ? t('youHaveXFightsLeft', { value: brute.fightsLeft }) : t('youHaveOneFightLeft')}</Text>
       </Paper>
       <Paper sx={{ bgcolor: 'background.paperLight', mt: -2 }}>
         <Grid container spacing={1}>

@@ -7,7 +7,6 @@ import canLevelUp from './brute/canLevelUp';
 import colors from './brute/colors';
 import createRandomBruteStats from './brute/createRandomBruteStats';
 import getBruteGoldValue from './brute/getBruteGoldValue';
-import getFightsLeft from './brute/getFightsLeft';
 import getGoldNeededForNewBrute from './brute/getGoldNeededForNewBrute';
 import getHP from './brute/getHP';
 import getLevelUpChoices from './brute/getLevelUpChoices';
@@ -41,7 +40,7 @@ export {
   Boss, ExpectedError, Version, adjustColor, applySkillModifiers,
   availableBodyParts, bosses, canLevelUp, colors,
   createRandomBruteStats, formatLargeNumber, getBruteGoldValue,
-  getFightsLeft, getGoldNeededForNewBrute, getHP,
+  getGoldNeededForNewBrute, getHP,
   getLevelUpChoices,
   getMaxFightsPerDay,
   getRandomBody,

@@ -1,4 +1,4 @@
-import { ExpectedError, LOSE_XP, WIN_XP, getFightsLeft } from '@labrute/core';
+import { ExpectedError, LOSE_XP, WIN_XP } from '@labrute/core';
 import {
   PrismaClient, Prisma, User,
 } from '@labrute/prisma';
@@ -51,7 +51,7 @@ export async function doFight(
   );
 
   // Cancel if brute1 has no fights left
-  if (arenaFight && getFightsLeft(brute1) <= 0) {
+  if (arenaFight && brute1.fightsLeft <= 0) {
     throw new ExpectedError(translate('noFightsLeft', user));
   }
 
@@ -61,7 +61,7 @@ export async function doFight(
       where: { id: brute1.id },
       data: {
         lastFight: new Date(),
-        fightsLeft: getFightsLeft(brute1) - 1,
+        fightsLeft: brute1.fightsLeft - 1,
       },
       select: { id: true },
     });
