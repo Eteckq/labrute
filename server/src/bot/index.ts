@@ -61,6 +61,7 @@ export default async (prisma: PrismaClient) => {
       const brute = await prisma.brute.findFirst({
         where: {
           user,
+          deletedAt: null,
         },
         include: {
           body: true,
