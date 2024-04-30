@@ -513,11 +513,6 @@ const Brutes = {
         throw new ExpectedError(translate('bruteNotFound', user));
       }
 
-      // Prevent sacrificing the day of creation
-      if (moment.utc().isSame(moment.utc(brute.createdAt), 'day')) {
-        throw new ExpectedError(translate('cannotSacrificeSameDay', user));
-      }
-
       // Check if brute is master of a clan
       const isClanMaster = await prisma.clan.count({
         where: {
