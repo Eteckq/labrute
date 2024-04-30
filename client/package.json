@@ -8,7 +8,7 @@
     "compile": "tsc --build ./tsconfig.json",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "build": "react-scripts --max_old_space_size=1024 build",
+    "build": "react-scripts build",
     "serve": "serve -s build -p 4445"
   },
   "dependencies": {
