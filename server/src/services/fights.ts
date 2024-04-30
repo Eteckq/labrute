@@ -116,17 +116,28 @@ export async function doFight(
   // (+1 for a win against a brute at least 10 level below you)
   // (+0 otherwise)
   const levelDifference = brute1.level - brute2.level;
-  const xpGained = arenaFight
-    ? generatedFight.winner === brute1.name
-      ? levelDifference > 10
-        ? 0
-        : levelDifference > 2
-          ? LOSE_XP
-          : WIN_XP
-      : levelDifference > 10
-        ? 0
-        : LOSE_XP
-    : 0;
+
+  let xpGained = 0;
+
+  if (arenaFight) {
+    if (generatedFight.winner === brute1.name) {
+      if (levelDifference > 10) {
+        xpGained = 0;
+      } else if (levelDifference > 2) {
+        xpGained = LOSE_XP;
+      } else {
+        xpGained = WIN_XP;
+      }
+    } else if (levelDifference > 10) {
+      xpGained = 0;
+    } else {
+      xpGained = LOSE_XP;
+    }
+
+    if (!brute2.userId) {
+      xpGained /= 2;
+    }
+  }
 
   // Update brute XP and victories if arena fight
   if (arenaFight) {

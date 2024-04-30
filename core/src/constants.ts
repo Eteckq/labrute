@@ -4,8 +4,8 @@ import { SKILLS_TOTAL_ODDS } from './brute/skills';
 import { WEAPONS_TOTAL_ODDS, WeaponAnimations } from './brute/weapons';
 
 export const MAX_STACK_FIGHTS = 4;
-export const WIN_XP = 5;
-export const LOSE_XP = 4;
+export const WIN_XP = 4;
+export const LOSE_XP = 2;
 
 export const ARENA_OPPONENTS_COUNT = 4;
 export const ARENA_OPPONENTS_MAX_GAP = 2;
