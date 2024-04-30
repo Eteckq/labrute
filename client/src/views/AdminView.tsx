@@ -57,6 +57,13 @@ const AdminView = () => {
     }).catch(catchError(Alert));
   }, [Alert]);
 
+  // Run daily job
+  const runGiveFight = useCallback(() => {
+    Server.User.runGiveFight().then(() => {
+      Alert.open('success', 'Fights given');
+    }).catch(catchError(Alert));
+  }, [Alert]);
+
   // Fetch brute
   const updateBrute = useCallback(() => {
     Server.Brute.getForAdmin(bruteName).then((b) => {
@@ -157,6 +164,7 @@ const AdminView = () => {
               <FantasyButton color="error" onClick={deleteDailyTournaments}>DELETE DAILY TOURNAMENTS</FantasyButton>
               <FantasyButton color="error" onClick={deleteGlobalTournament}>DELETE GLOBAL TOURNAMENT</FantasyButton>
               <FantasyButton color="warning" onClick={runDailyJob}>RUN DAILY JOB</FantasyButton>
+              <FantasyButton color="warning" onClick={runGiveFight}>RUN GIVE FIGHTS JOB</FantasyButton>
               <Link to="/admin-panel/user">
                 <FantasyButton color="secondary">USER ADMIN</FantasyButton>
               </Link>

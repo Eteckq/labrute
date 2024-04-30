@@ -12,6 +12,7 @@ import dailyJob from '../dailyJob.js';
 import auth from '../utils/auth.js';
 import sendError from '../utils/sendError.js';
 import translate from '../utils/translate.js';
+import giveFightJob from '../giveFightJob.js';
 
 const Users = {
   get: (prisma: PrismaClient) => async (
@@ -77,6 +78,23 @@ const Users = {
       const user = await auth(prisma, req);
 
       res.send(user);
+    } catch (error) {
+      sendError(res, error);
+    }
+  },
+  runGiveFight: (prisma: PrismaClient) => async (req: Request, res: Response) => {
+    try {
+      const user = await auth(prisma, req);
+
+      if (!user.admin) {
+        throw new Error(translate('unauthorized', user));
+      }
+
+      await giveFightJob(prisma)().catch((error: Error) => {
+        DISCORD.sendError(error);
+      });
+
+      res.send({ message: 'Job run' });
     } catch (error) {
       sendError(res, error);
     }

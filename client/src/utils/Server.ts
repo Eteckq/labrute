@@ -11,6 +11,7 @@ const Server = {
     }, 'POST'),
     getForAdmin: (name: string) => Fetch<UserGetAdminResponse>(`/api/user/${name}/admin`),
     runDailyJob: () => Fetch<never>('/api/run-daily-job'),
+    runGiveFight: () => Fetch<never>('/api/run-give-fight'),
     changeLanguage: (lang: Lang) => Fetch<never>('/api/user/change-language', { lang }, 'POST'),
     changeFightSpeed: (fightSpeed: number) => Fetch<never>('/api/user/change-fight-speed', { fightSpeed }, 'POST'),
     toggleBackgroundMusic: (backgroundMusic: boolean) => Fetch<never>('/api/user/toggle-background-music', { backgroundMusic }, 'POST'),
