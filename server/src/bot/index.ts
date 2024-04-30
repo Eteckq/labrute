@@ -14,6 +14,7 @@ import { PrismaClient } from '@labrute/prisma';
 import { canLevelUp, getLevelUpChoices } from '@labrute/core';
 import Env from '../utils/Env.js';
 import { doFight } from '../services/fights.js';
+import { fcGetOpponnents } from '../services/fcGetOpponents.js';
 
 const commands = [
   {
@@ -75,27 +76,29 @@ export default async (prisma: PrismaClient) => {
           ephemeral: true,
         });
       } else if (interaction.commandName === 'fight') {
-        if (!brute.opponents) {
+        const opponents = await fcGetOpponnents(prisma, user, brute.name);
+
+        if (!opponents) {
           await interaction.reply({
             content: 'Error while finding opponents',
             ephemeral: true,
           });
         } else {
           const components = [];
-          if (brute.opponents.length === 0) {
+          if (opponents.length === 0) {
             await interaction.reply({
-              content: 'Aucun adversaires dicponibles',
+              content: 'Aucun adversaires disponibles',
               ephemeral: true,
             });
           } else {
-            for (const opponent of brute.opponents) {
-              const pseudo = opponent.user ? opponent.user.name : 'bot';
+            for (const opponent of opponents) {
+              const pseudo = (opponent as any).user ? (opponent as any).user.name : 'bot';
               components.push(
                 new ButtonBuilder()
                   .setCustomId(opponent.name)
                   .setLabel(`${opponent.name} (${pseudo}) - lv${opponent.level}`)
                   .setStyle(
-                    opponent.user ? ButtonStyle.Primary : ButtonStyle.Secondary,
+                    (opponent as any).user ? ButtonStyle.Primary : ButtonStyle.Secondary,
                   ),
               );
             }

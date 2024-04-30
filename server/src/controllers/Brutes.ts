@@ -41,6 +41,7 @@ import sendError from '../utils/sendError.js';
 import translate from '../utils/translate.js';
 import { increaseAchievement } from './Achievements.js';
 import { LOGGER } from '../context.js';
+import { fcGetOpponnents } from '../services/fcGetOpponents.js';
 
 const Brutes = {
   getForVersus: (prisma: PrismaClient) => async (
@@ -494,65 +495,7 @@ const Brutes = {
     try {
       const user = await auth(prisma, req);
 
-      // Get brute
-      const brute = await prisma.brute.findFirst({
-        where: {
-          name: req.params.name,
-          deletedAt: null,
-          userId: user.id,
-        },
-        select: {
-          id: true,
-          name: true,
-          level: true,
-          opponentsGeneratedAt: true,
-          opponents: {
-            select: {
-              id: true,
-              name: true,
-              level: true,
-              gender: true,
-              hp: true,
-              strengthValue: true,
-              agilityValue: true,
-              speedValue: true,
-              deletedAt: true,
-              body: true,
-              colors: true,
-            },
-          },
-        },
-      });
-
-      if (!brute) {
-        throw new ExpectedError(translate('bruteNotFound', user));
-      }
-
-      // Handle deleted opponents
-      let opponents = brute.opponents.filter((o) => o.deletedAt === null);
-
-      // If never generated today or not enough opponents, reset opponents
-      if (!brute.opponentsGeneratedAt || moment.utc(brute.opponentsGeneratedAt).isBefore(moment.utc().startOf('day')) || opponents.length < ARENA_OPPONENTS_COUNT) {
-        // Get opponents
-        opponents = await getOpponents(prisma, brute);
-
-        // Save opponents
-        await prisma.brute.update({
-          where: {
-            id: brute.id,
-          },
-          data: {
-            opponents: {
-              set: opponents.map((o) => ({
-                id: o.id,
-              })),
-            },
-            // Update opponentsGeneratedAt
-            opponentsGeneratedAt: new Date(),
-          },
-          select: { id: true },
-        });
-      }
+      const opponents = await fcGetOpponnents(prisma, user, req.params.name);
 
       res.send(opponents);
     } catch (error) {

@@ -53,6 +53,7 @@ const getOpponents = async (
         deletedAt: true,
         body: true,
         colors: true,
+        user: true,
       },
     });
 
