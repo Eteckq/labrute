@@ -111,31 +111,27 @@ export async function doFight(
     select: { id: true, winner: true, loser: true },
   });
 
-  // Get XP gained (0 for non arena fights)
-  // (+2 for a win against a brute at least 2 level below you)
-  // (+1 for a win against a brute at least 10 level below you)
-  // (+0 otherwise)
   const levelDifference = brute1.level - brute2.level;
 
   let xpGained = 0;
 
   if (arenaFight) {
     if (generatedFight.winner === brute1.name) {
-      if (levelDifference > 10) {
-        xpGained = 0;
-      } else if (levelDifference > 2) {
-        xpGained = LOSE_XP;
-      } else {
-        xpGained = WIN_XP;
-      }
-    } else if (levelDifference > 10) {
-      xpGained = 0;
+      xpGained = Math.max(WIN_XP - (Math.floor(levelDifference / 2)), LOSE_XP);
     } else {
       xpGained = LOSE_XP;
     }
 
     if (!brute2.userId) {
-      xpGained /= 2;
+      xpGained = Math.ceil(xpGained);
+    }
+
+    const maxLevelBrute = await prisma.brute.findFirst(
+      { where: { user: { isNot: null }, deletedAt: null }, orderBy: { level: 'desc' } },
+    );
+
+    if (maxLevelBrute) {
+      xpGained += Math.max(Math.floor((maxLevelBrute.level - brute1.level) / 5), 0);
     }
   }
 

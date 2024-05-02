@@ -129,6 +129,7 @@ export default async (prisma: PrismaClient) => {
                   const targetBrute = await prisma.brute.findFirst({
                     where: {
                       name: confirmation.customId,
+                      deletedAt: null,
                     },
                     select: {
                       user: true,
@@ -146,6 +147,7 @@ export default async (prisma: PrismaClient) => {
                   const updatedBrute = await prisma.brute.findFirst({
                     where: {
                       user,
+                      deletedAt: null,
                     },
                     select: {
                       xp: true,

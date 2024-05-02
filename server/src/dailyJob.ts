@@ -11,7 +11,7 @@ import ServerState from './utils/ServerState.js';
 import generateFight from './utils/fight/generateFight.js';
 import shuffle from './utils/shuffle.js';
 
-const GENERATE_TOURNAMENTS_IN_DEV = false;
+const GENERATE_TOURNAMENTS_IN_DEV = true;
 
 const grantBetaAchievement = async (prisma: PrismaClient) => {
   // Grant beta achievement to all brutes who don't have it yet
@@ -166,10 +166,7 @@ const handleDailyTournaments = async (prisma: PrismaClient) => {
   const registeredBrutes = await prisma.brute.findMany({
     where: {
       deletedAt: null,
-      registeredForTournament: true,
-      nextTournamentDate: {
-        lt: tomorrow.toDate(),
-      },
+      user: { isNot: null },
       tournaments: {
         none: {
           type: TournamentType.DAILY,
@@ -191,6 +188,33 @@ const handleDailyTournaments = async (prisma: PrismaClient) => {
   // All brutes are assigned, do nothing
   if (registeredBrutes.length === 0) {
     return xpGains;
+  }
+
+  if (registeredBrutes.length < 64) {
+    const botRegistered = await prisma.brute.findMany({
+      where: {
+        deletedAt: null,
+        userId: null,
+        tournaments: {
+          none: {
+            type: TournamentType.DAILY,
+            date: {
+              gte: today.toDate(),
+              lt: tomorrow.toDate(),
+            },
+          },
+        },
+      },
+      select: {
+        id: true,
+        level: true,
+        ranking: true,
+        name: true,
+      },
+      take: 64 - registeredBrutes.length,
+    });
+
+    registeredBrutes.push(...botRegistered);
   }
 
   // Shuffle brutes
@@ -464,7 +488,7 @@ const handleDailyTournaments = async (prisma: PrismaClient) => {
       },
     },
     data: {
-      registeredForTournament: false,
+      registeredForTournament: true,
       nextTournamentDate: null,
       // Add current tournament data too
       currentTournamentDate: today.toDate(),
