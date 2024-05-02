@@ -3,7 +3,7 @@ import { PETS_TOTAL_ODDS } from './brute/pets';
 import { SKILLS_TOTAL_ODDS } from './brute/skills';
 import { WEAPONS_TOTAL_ODDS, WeaponAnimations } from './brute/weapons';
 
-export const MAX_STACK_FIGHTS = 4;
+export const MAX_STACK_FIGHTS = 6;
 export const WIN_XP = 4;
 export const LOSE_XP = 2;
 
