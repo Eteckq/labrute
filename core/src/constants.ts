@@ -7,8 +7,8 @@ export const MAX_STACK_FIGHTS = 4;
 export const WIN_XP = 4;
 export const LOSE_XP = 2;
 
-export const ARENA_OPPONENTS_COUNT = 6;
-export const ARENA_OPPONENTS_MAX_GAP = 3;
+export const ARENA_OPPONENTS_COUNT = 8;
+export const ARENA_OPPONENTS_MAX_GAP = 5;
 
 export const BRUTE_STARTING_POINTS = 11;
 export const PERKS_TOTAL_ODDS = WEAPONS_TOTAL_ODDS + PETS_TOTAL_ODDS + SKILLS_TOTAL_ODDS;
