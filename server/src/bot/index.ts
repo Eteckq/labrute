@@ -98,7 +98,10 @@ export default async (prisma: PrismaClient) => {
                 ephemeral: true,
               });
             } else {
+              let i = 0;
               for (const opponent of opponents) {
+                i++;
+                if (i > 5) break;
                 const pseudo = (opponent as any).user ? (opponent as any).user.name : 'bot';
                 components.push(
                   new ButtonBuilder()
