@@ -410,7 +410,7 @@ const handleDailyTournaments = async (prisma: PrismaClient) => {
         });
 
         // Store XP for winner
-        xpGains[winnerId] = (xpGains[winnerId] || 0) + 1;
+        xpGains[winnerId] = (xpGains[winnerId] || 0) + 3;
 
         step++;
       }
