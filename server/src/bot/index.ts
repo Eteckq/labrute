@@ -98,7 +98,7 @@ export default async (prisma: PrismaClient) => {
                 ephemeral: true,
               });
             } else {
-              const names = [];
+              const names: string[] = [];
               for (const opponent of opponents) {
                 if (names.length >= 5 || names.some(n => n == opponent.name)) break;
                 names.push(opponent.name);
