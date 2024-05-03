@@ -356,7 +356,7 @@
   "sacrificeConfirm": "Voulez-vous vraiment sacrifier votre brute pour {{gold}} Or ? Cette action est irréversible.",
   "sacrificeSuccess": "Sacrifice réussi, vous avez gagné {{gold}} Or",
   "reset": "Réinitialiser",
-  "resetConfirm": "Êtes-vous sûr de vouloir réinitialiser votre brute au niveau 1 ? Cela vous coûtera {{gold}} Or. Cette action ne peut pas être annulée.",
+  "resetConfirm": "Êtes-vous sûr de vouloir réinitialiser votre brute au niveau 1, avec un nouvel arbre de compétence ? Cela vous coûtera {{gold}} Or. Cette action ne peut pas être annulée.",
   "resetSuccess": "Réinitialisation réussie",
   "resetVisuals": "Changer d'apparence",
   "resetVisualsDescription": "Vous pouvez changer l'apparence de votre brute ici. Attention, cette action ne peut pas être annulée.",
