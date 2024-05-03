@@ -14,7 +14,7 @@ import {
 import {
   Brute, DestinyChoice, PrismaClient, User,
 } from '@labrute/prisma';
-import { canLevelUp, getLevelUpChoices } from '@labrute/core';
+import { canLevelUp } from '@labrute/core';
 import { t } from 'i18next';
 import Env from '../utils/Env.js';
 import { doFight } from '../services/fights.js';
@@ -119,6 +119,7 @@ async function handleFight(prisma: PrismaClient, user: User, brute: Brute, inter
                 pets: true,
                 skills: true,
                 weapons: true,
+                destinyPath: true,
               },
             });
             if (updatedBrute) {
@@ -127,11 +128,11 @@ async function handleFight(prisma: PrismaClient, user: User, brute: Brute, inter
                   .setColor(0xff00ff)
                   .setTitle('Level up!')
                   .setURL(`${Env.SELF_URL}/${brute.name}/level-up`);
-                const choices = await levelUp(prisma, user, brute);
+                const choices = await levelUp(prisma, user, updatedBrute);
 
+                let txt = '';
                 for (let index = 0; index < choices.length; index++) {
                   const choice: DestinyChoice = choices[index];
-                  let txt = '';
                   if (choice.type === 'stats' && choice.stat1) {
                     txt += `[STATS] +${choice.stat1Value} ${translate(choice.stat1, user)}`;
 
@@ -139,13 +140,18 @@ async function handleFight(prisma: PrismaClient, user: User, brute: Brute, inter
                       txt += ` | +${choice.stat2Value} ${translate(choice.stat2, user)}`;
                     }
                   } else if (choice.type === 'skill' && choice.skill) {
-                    txt += `[SKILL] ${t(choice.skill, { lng: 'fr' })} -> ${translate(choice.skill, user)} `;
+                    txt += `[SKILL] ${translate(choice.skill, user)} ${translate(`${choice.skill}.effect`, user) !== `${choice.skill}.effect` ? `-> ${translate(`${choice.skill}.effect`, user)}` : ''}`;
+                  } else if (choice.type === 'weapon' && choice.weapon) {
+                    txt += `[WEAPON] ${translate(choice.weapon, user)} `;
+                  } else if (choice.type === 'pet' && choice.pet) {
+                    txt += `[PET] ${translate(choice.pet, user)} `;
                   }
 
-                  const direction = index === 0 ? 'LEFT' : 'RIGHT';
-
-                  console.log(txt, direction, user.lang);
+                  const direction = ''; // index === 0 ? 'LEFT' : 'RIGHT';
+                  txt += ` ${direction}\n`;
                 }
+
+                levelupEmbed.setDescription(txt);
 
                 await interaction.editReply({
                   embeds: [levelupEmbed],

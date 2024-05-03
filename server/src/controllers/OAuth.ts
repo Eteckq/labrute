@@ -23,7 +23,7 @@ const OAuth = {
   redirect: (req: Request, res: Response) => {
     try {
       res.send({
-        url: `${OAuth2Routes.authorizationURL}?client_id=1232306145582911528&response_type=code&redirect_uri=${Env.SELF_URL}&scope=identify`,
+        url: `${OAuth2Routes.authorizationURL}?client_id=${Env.DISCORD_CLIENT_ID}&response_type=code&redirect_uri=${Env.SELF_URL}&scope=identify`,
       });
     } catch (error) {
       sendError(res, error);

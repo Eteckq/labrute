@@ -5,7 +5,7 @@ import {
 import { PrismaClient } from '@prisma/client';
 import translate from '../utils/translate.js';
 
-export async function levelUp(prisma: PrismaClient, user: User, brute: Brute) {
+export async function levelUp(prisma: PrismaClient, user: User, brute: Pick<Brute, 'id' | 'level' | 'pets' | 'skills' | 'weapons' | 'xp' | 'destinyPath'>) {
   if (!canLevelUp(brute)) {
     throw new ExpectedError(translate('bruteCannotLevelUp', user));
   }
