@@ -53,12 +53,6 @@ const CellSocials = ({
           <Text h2 smallCaps sx={{ display: 'inline-block' }}>{brute.name}</Text>
         </Grid>
         <Grid item xs={smallScreen ? 6 : 3}>
-          {!!brute.master && (
-            <Box>
-              <Text bold color="secondary" component="span">{t('master')}: </Text>
-              <Text bold component="span"><Link to={`/${brute.master.name}/cell`}>{brute.master.name}</Link></Text>
-            </Box>
-          )}
           <Box>
             <Link to={`/${brute.name}/ranking`}>
               <Text bold color="secondary" component="span">{t('ranking')}: </Text>
@@ -67,6 +61,11 @@ const CellSocials = ({
               </Text>
             </Link>
           </Box>
+          {user?.brutes[0] && (
+            <Box>
+              <Text bold component="span"><Link to={`/${user?.brutes[0].name}/cell`}>Cellule de {user?.brutes[0].name}</Link></Text>
+            </Box>
+          )}
         </Grid>
         <Grid item xs={smallScreen ? 6 : 3}>
           <Box>
