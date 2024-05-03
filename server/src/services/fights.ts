@@ -12,6 +12,7 @@ export async function doFight(
   user: User,
   brute1_name: string,
   brute2_name: string,
+  forceTraining: boolean = false,
 ) {
   // Get brutes
   const brute1 = await prisma.brute.findFirst({
@@ -46,13 +47,11 @@ export async function doFight(
     throw new ExpectedError(translate('bruteNotFound', user));
   }
   // Check if this is an arena fight
-  const arenaFight = brute1.opponents.some(
+  let arenaFight = brute1.opponents.some(
     (opponent) => opponent.name === brute2.name,
-  );
-
-  // Cancel if brute1 has no fights left
-  if (arenaFight && brute1.fightsLeft <= 0) {
-    throw new ExpectedError(translate('noFightsLeft', user));
+  ) && brute1.fightsLeft > 0;
+  if (forceTraining) {
+    arenaFight = false;
   }
 
   // Update brute last fight and fights left if arena fight
@@ -123,7 +122,7 @@ export async function doFight(
     }
 
     if (!brute2.userId) {
-      xpGained = Math.ceil(xpGained);
+      xpGained -= 1;
     }
 
     const maxLevelBrute = await prisma.brute.findFirst(

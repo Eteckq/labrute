@@ -166,7 +166,7 @@ const getOpponents = async (
     opponents.push(...additionalOpponents);
   }
 
-  return opponents;
+  return opponents.filter((v, i, a) => a.findIndex((v2) => v2.name === v.name) === i);
 };
 
 export default getOpponents;

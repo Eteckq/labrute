@@ -73,12 +73,10 @@ const CellSocials = ({
             <Text bold color="secondary" component="span">{t('victories')}: </Text>
             <Text bold component="span">{brute.victories}</Text>
           </Box>
-          {!!brute.pupilsCount && (
-            <Box>
-              <Text bold color="secondary" component="span">{t('pupils')}: </Text>
-              <Text bold component="span">{brute.pupilsCount}</Text>
-            </Box>
-          )}
+          <Box>
+            <Text bold color="secondary" component="span">{t('gold')}: </Text>
+            <Text bold component="span">{user?.gold}</Text>
+          </Box>
         </Grid>
       </Grid>
       {brute.user && (

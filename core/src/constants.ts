@@ -7,7 +7,7 @@ export const MAX_STACK_FIGHTS = 6;
 export const WIN_XP = 4;
 export const LOSE_XP = 2;
 
-export const ARENA_OPPONENTS_COUNT = 5;
+export const ARENA_OPPONENTS_COUNT = 8;
 export const ARENA_OPPONENTS_MAX_GAP = 5;
 
 export const BRUTE_STARTING_POINTS = 11;
@@ -79,4 +79,4 @@ export type FighterStat = keyof typeof BASE_FIGHTER_STATS;
 
 export const BARE_HANDS_DAMAGE = 5;
 
-export const RESET_PRICE = 0;
+export const RESET_PRICE = 100;

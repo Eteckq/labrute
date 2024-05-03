@@ -39,6 +39,7 @@ import translate from '../utils/translate.js';
 import { increaseAchievement } from './Achievements.js';
 import { LOGGER } from '../context.js';
 import { fcGetOpponnents } from '../services/fcGetOpponents.js';
+import { levelUp } from '../services/levelUp.js';
 
 const Brutes = {
   getForVersus: (prisma: PrismaClient) => async (
@@ -294,56 +295,12 @@ const Brutes = {
   getLevelUpChoices: (prisma: PrismaClient) => async (req: Request, res: Response) => {
     try {
       const user = await auth(prisma, req);
-
-      // Get brute
       const brute = user.brutes.find((b) => b.name === req.params.name);
       if (!brute) {
         throw new ExpectedError(translate('bruteNotFound', user));
       }
 
-      if (!canLevelUp(brute)) {
-        throw new ExpectedError(translate('bruteCannotLevelUp', user));
-      }
-
-      const firstChoicePath = [...brute.destinyPath, DestinyChoiceSide.LEFT];
-      const secondChoicePath = [...brute.destinyPath, DestinyChoiceSide.RIGHT];
-
-      // Get destiny choices
-      let firstDestinyChoice = await prisma.destinyChoice.findFirst({
-        where: {
-          bruteId: brute.id,
-          path: { equals: firstChoicePath },
-        },
-      });
-      let secondDestinyChoice = await prisma.destinyChoice.findFirst({
-        where: {
-          bruteId: brute.id,
-          path: { equals: secondChoicePath },
-        },
-      });
-
-      if (!firstDestinyChoice || !secondDestinyChoice) {
-        const newChoices = getLevelUpChoices(brute);
-
-        // Create destiny choices
-        const newFirstDestinyChoice = await prisma.destinyChoice.create({
-          data: {
-            ...newChoices[0],
-            path: firstChoicePath,
-            brute: { connect: { id: brute.id } },
-          },
-        });
-        firstDestinyChoice = newFirstDestinyChoice;
-
-        const newSecondDestinyChoice = await prisma.destinyChoice.create({
-          data: {
-            ...newChoices[1],
-            path: secondChoicePath,
-            brute: { connect: { id: brute.id } },
-          },
-        });
-        secondDestinyChoice = newSecondDestinyChoice;
-      }
+      const [firstDestinyChoice, secondDestinyChoice] = await levelUp(prisma, user, brute);
 
       res.send({
         brute,
@@ -839,42 +796,51 @@ const Brutes = {
         throw new ExpectedError(translate('bruteAlreadyMaxRank', user));
       }
 
-      // Get first bonus
-      const firstBonus = await prisma.destinyChoice.findFirst({
-        where: {
-          bruteId: userBrute.id,
-          path: { equals: [] },
+      // Give 100 gold
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          gold: { increment: RESET_PRICE * 2 },
         },
       });
-
-      if (!firstBonus) {
-        throw new Error(translate('noFirstBonus', user));
-      }
-
-      // Random stats
-      const stats = createRandomBruteStats(
-        firstBonus.type,
-        firstBonus.type === DestinyChoiceType.pet
-          ? firstBonus.pet
-          : firstBonus.type === DestinyChoiceType.weapon
-            ? firstBonus.weapon
-            : firstBonus.skill,
-      );
 
       // Update the brute
       const brute = await prisma.brute.update({
         where: { id: userBrute.id },
         data: {
-          ...stats,
+          ...createRandomBruteStats(),
           // Rank up
           ranking: userBrute.ranking - 1,
           canRankUpSince: null,
-          // Store previous destiny
-          previousDestinyPath: userBrute.destinyPath,
-          // Reset destiny
           destinyPath: [],
           // Reset fights left
-          fightsLeft: getMaxFightsPerDay(stats),
+          fightsLeft: getMaxFightsPerDay(userBrute),
+        },
+      });
+
+      const firstBonusType = brute.skills.length
+        ? DestinyChoiceType.skill
+        : brute.weapons.length
+          ? DestinyChoiceType.weapon
+          : DestinyChoiceType.pet;
+
+      await prisma.destinyChoice.deleteMany({
+        where: {
+          bruteId: brute.id,
+        },
+      });
+
+      const destinyChoice = await prisma.destinyChoice.create({
+        data: {
+          type: firstBonusType,
+          pet: firstBonusType === DestinyChoiceType.pet
+            ? brute.pets[0] : undefined,
+          skill: firstBonusType === DestinyChoiceType.skill
+            ? brute.skills[0] : undefined,
+          weapon: firstBonusType === DestinyChoiceType.weapon
+            ? brute.weapons[0] : undefined,
+          bruteId: brute.id,
+          path: [],
         },
       });
 
@@ -882,7 +848,7 @@ const Brutes = {
       await increaseAchievement(prisma, user.id, brute.id, `rankUp${brute.ranking as 10 | 9 | 8 | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0}`);
 
       // Update achievements for the first bonus
-      await checkLevelUpAchievements(prisma, brute, firstBonus);
+      await checkLevelUpAchievements(prisma, brute, destinyChoice);
 
       // Add rank up log
       await prisma.log.create({
@@ -1284,18 +1250,6 @@ const Brutes = {
         throw new ExpectedError(translate('notEnoughGold', user));
       }
 
-      // Get first bonus
-      const firstBonus = await prisma.destinyChoice.findFirst({
-        where: {
-          bruteId: brute.id,
-          path: { equals: [] },
-        },
-      });
-
-      if (!firstBonus) {
-        throw new Error(translate('noFirstBonus', user));
-      }
-
       // Remove gold from user
       await prisma.user.update({
         where: { id: user.id },
@@ -1305,29 +1259,14 @@ const Brutes = {
         select: { id: true },
       });
 
-      // Random stats
-      const stats = createRandomBruteStats(
-        firstBonus.type,
-        firstBonus.type === DestinyChoiceType.pet
-          ? firstBonus.pet
-          : firstBonus.type === DestinyChoiceType.weapon
-            ? firstBonus.weapon
-            : firstBonus.skill,
-      );
-
       // Update the brute
-      const updatedBrute: HookBrute = await prisma.brute.update({
+      const updatedBrute = await prisma.brute.update({
         where: { id: brute.id },
         data: {
-          ...stats,
-          // Store previous destiny
-          previousDestinyPath: brute.destinyPath,
-          // Reset destiny
+          ...createRandomBruteStats(),
           destinyPath: [],
           // Reset fights left
-          fightsLeft: getMaxFightsPerDay(stats),
-          // Keep ranking
-          ranking: brute.ranking,
+          fightsLeft: getMaxFightsPerDay(brute),
         },
         include: {
           master: {
@@ -1360,8 +1299,34 @@ const Brutes = {
         },
       });
 
+      const firstBonusType = updatedBrute.skills.length
+        ? DestinyChoiceType.skill
+        : updatedBrute.weapons.length
+          ? DestinyChoiceType.weapon
+          : DestinyChoiceType.pet;
+
+      await prisma.destinyChoice.deleteMany({
+        where: {
+          bruteId: updatedBrute.id,
+        },
+      });
+
+      const destinyChoice = await prisma.destinyChoice.create({
+        data: {
+          type: firstBonusType,
+          pet: firstBonusType === DestinyChoiceType.pet
+            ? updatedBrute.pets[0] : undefined,
+          skill: firstBonusType === DestinyChoiceType.skill
+            ? updatedBrute.skills[0] : undefined,
+          weapon: firstBonusType === DestinyChoiceType.weapon
+            ? updatedBrute.weapons[0] : undefined,
+          bruteId: updatedBrute.id,
+          path: [],
+        },
+      });
+
       // Update achievements for the first bonus
-      await checkLevelUpAchievements(prisma, updatedBrute, firstBonus);
+      await checkLevelUpAchievements(prisma, updatedBrute, destinyChoice);
 
       // Get new opponents
       const opponents = await getOpponents(prisma, updatedBrute);
