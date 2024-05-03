@@ -457,17 +457,17 @@ const handleDailyTournaments = async (prisma: PrismaClient) => {
     // Only for real brutes
     if (winnerBrute.userId) {
       // Add 100 Gold to winner user
-      await prisma.tournamentGold.create({
-        data: {
-          userId: winnerBrute.userId,
-          date: today.toDate(),
-          gold: 100,
-        },
-        select: { id: true },
-      });
+      // await prisma.tournamentGold.create({
+      //   data: {
+      //     userId: winnerBrute.userId,
+      //     date: today.toDate(),
+      //     gold: 100,
+      //   },
+      //   select: { id: true },
+      // });
 
       // Allow rank up for winner if opponent wasn't lower rank
-      if (!winnerBrute.canRankUpSince && winnerBrute.ranking >= loserBrute.ranking) {
+      if (!winnerBrute.canRankUpSince && winnerBrute.ranking >= loserBrute.ranking - 1) {
         await prisma.brute.update({
           where: { id: winnerBrute.id },
           data: { canRankUpSince: new Date() },
@@ -697,12 +697,12 @@ const handleGlobalTournament = async (prisma: PrismaClient) => {
     throw new Error('Winner user not found');
   }
 
-  // Add 150 Gold to the winner user
+  // Add 30 Gold to the winner user
   await prisma.tournamentGold.create({
     data: {
       userId: winnerUser.id,
       date: today.toDate(),
-      gold: 150,
+      gold: 30,
     },
     select: { id: true },
   });
