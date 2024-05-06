@@ -1,8 +1,10 @@
 /* eslint-disable no-await-in-loop */
 import {
   Fighter,
+  randomBetween,
 } from '@labrute/core';
 import {
+  InventoryItemType,
   LogType, Prisma, PrismaClient, TournamentType,
 } from '@labrute/prisma';
 import moment from 'moment';
@@ -683,6 +685,28 @@ const handleGlobalTournament = async (prisma: PrismaClient) => {
   //   },
   //   select: { id: true },
   // });
+
+  if (randomBetween(0, 100) > 90) {
+    // Give free visual reset
+    await prisma.bruteInventoryItem.upsert({
+      where: {
+        type_bruteId: {
+          bruteId: roundBrutes[0].id,
+          type: InventoryItemType.visualReset,
+        },
+      },
+      create: {
+        type: InventoryItemType.visualReset,
+        count: 1,
+        bruteId: roundBrutes[0].id,
+      },
+      update: {
+        count: {
+          increment: 1,
+        },
+      },
+    });
+  }
 
   // Update tournament with rounds
   await prisma.tournament.update({
