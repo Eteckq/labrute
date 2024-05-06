@@ -36,8 +36,9 @@ function formatEmbedTitle(title: string) {
 
 export interface DiscordClient {
   sendError(error: Error, res?: Response): void;
-  sendTournamentNotification(tournament: Pick<Tournament, 'date'>, brutes: Pick<Brute, 'name' | 'level'>[]): void;
+  sendTournamentNotification(tournament: Pick<Tournament, 'date'>, brutes: Pick<Brute, 'name' | 'level' | 'userId'>[]): void;
   sendMessage(message: string): Promise<void>;
+  sendNewFight(): void;
 }
 
 export const NOOP_DISCORD_CLIENT: DiscordClient = {
@@ -47,6 +48,8 @@ export const NOOP_DISCORD_CLIENT: DiscordClient = {
   },
   sendMessage() {
     return Promise.resolve();
+  },
+  sendNewFight() {
   },
 };
 
@@ -153,31 +156,50 @@ ${error.stack}
     });
   }
 
-  public sendTournamentNotification(tournament: Pick<Tournament, 'date'>, brutes: Pick<Brute, 'name' | 'level'>[]) {
+  public sendTournamentNotification(tournament: Pick<Tournament, 'date'>, brutes: Pick<Brute, 'name' | 'level' | 'userId'>[]) {
     const embed = new EmbedBuilder()
       .setColor(0xebad70)
-      .setTitle(formatEmbedTitle('New tournament created!'))
+      .setTitle(formatEmbedTitle('Tournoi créé!'))
       .setURL(`${this.#server}${brutes[0].name}/tournament/${moment.utc(tournament.date).format('YYYY-MM-DD')}`)
       .setAuthor({
         name: 'LaBrute',
         iconURL: `${this.#server}/favicon.png`,
         url: this.#server.toString(),
       })
-      .setDescription('A new tournament has been created, come check it out! Here are some of the participants:')
+      .setDescription('Un nouveau tournoi a été crée. Les participants sont:')
       .setThumbnail(`${this.#server}/images/header/right/1${pad(Math.floor(Math.random() * (11 - 1 + 1) + 1), 2)}.png`)
       .addFields(
-        ...[...brutes].sort((a, b) => b.level - a.level).slice(0, 24).map((brute) => ({
-          name: brute.name,
-          value: `Level ${brute.level}`,
-          inline: true,
-        })),
-        { name: '...', value: '\u200B', inline: true },
+        ...[...brutes]
+          .filter((b) => b.userId)
+          .sort((a, b) => b.level - a.level)
+          .map((brute) => ({
+            name: brute.name,
+            value: `Level ${brute.level}`,
+            inline: true,
+          })),
       )
       .setTimestamp()
       .setFooter({
         text: 'Beep boop, I am a bot',
         iconURL: `${this.#server}/favicon.png`,
       });
+
+    this.#tournamentClient.send({ embeds: [embed] }).catch((err) => {
+      this.#logger.error(`Error trying to send a message: ${err}`);
+    });
+  }
+
+  public sendNewFight() {
+    const embed = new EmbedBuilder()
+      .setColor('#5eafff')
+      .setTitle(formatEmbedTitle('Ding ding!'))
+      .setAuthor({
+        name: 'LaBrute',
+        iconURL: `${this.#server}/favicon.png`,
+        url: this.#server.toString(),
+      })
+      .setDescription("C'est l'heure de rentrer dans l'arène!")
+      .setThumbnail(`${this.#server}/images/header/right/1${pad(Math.floor(Math.random() * (11 - 1 + 1) + 1), 2)}.png`);
 
     this.#tournamentClient.send({ embeds: [embed] }).catch((err) => {
       this.#logger.error(`Error trying to send a message: ${err}`);

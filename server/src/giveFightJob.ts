@@ -1,5 +1,6 @@
 import { getMaxFightsPerDay, randomBetween } from '@labrute/core';
 import { PrismaClient } from '@labrute/prisma';
+import { DISCORD } from './context.js';
 
 const giveFightJob = (prisma: PrismaClient) => async () => {
   const brutes = await prisma.brute.findMany({
@@ -9,7 +10,7 @@ const giveFightJob = (prisma: PrismaClient) => async () => {
   });
 
   for (const brute of brutes) {
-    if (brute.fightsLeft < getMaxFightsPerDay(brute)) {
+    if (brute.fightsLeft < getMaxFightsPerDay()) {
       prisma.brute.update({
         where: {
           id: brute.id,
@@ -20,6 +21,8 @@ const giveFightJob = (prisma: PrismaClient) => async () => {
       }).catch(console.error);
     }
   }
+
+  await DISCORD.sendNewFight();
 };
 
 export default giveFightJob;

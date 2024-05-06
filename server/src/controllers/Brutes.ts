@@ -812,7 +812,7 @@ const Brutes = {
           canRankUpSince: null,
           destinyPath: [],
           // Reset fights left
-          fightsLeft: getMaxFightsPerDay(userBrute),
+          fightsLeft: getMaxFightsPerDay(),
         },
       });
 
@@ -1264,7 +1264,7 @@ const Brutes = {
           ...createRandomBruteStats(),
           destinyPath: [],
           // Reset fights left
-          fightsLeft: getMaxFightsPerDay(brute),
+          fightsLeft: getMaxFightsPerDay(),
         },
         include: {
           master: {

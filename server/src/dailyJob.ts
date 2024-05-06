@@ -152,6 +152,7 @@ const handleDailyTournaments = async (prisma: PrismaClient) => {
       level: true,
       ranking: true,
       name: true,
+      userId: true,
     },
   });
 
@@ -183,6 +184,7 @@ const handleDailyTournaments = async (prisma: PrismaClient) => {
         level: true,
         ranking: true,
         name: true,
+        userId: true,
       },
       take: 64 - registeredBrutes.length,
     });
@@ -221,6 +223,7 @@ const handleDailyTournaments = async (prisma: PrismaClient) => {
         level: true,
         ranking: true,
         name: true,
+        userId: true,
       },
     });
 
