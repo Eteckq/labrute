@@ -675,14 +675,14 @@ const handleGlobalTournament = async (prisma: PrismaClient) => {
   }
 
   // Add 30 Gold to the winner user
-  await prisma.tournamentGold.create({
-    data: {
-      userId: winnerUser.id,
-      date: today.toDate(),
-      gold: 30,
-    },
-    select: { id: true },
-  });
+  // await prisma.tournamentGold.create({
+  //   data: {
+  //     userId: winnerUser.id,
+  //     date: today.toDate(),
+  //     gold: 30,
+  //   },
+  //   select: { id: true },
+  // });
 
   // Update tournament with rounds
   await prisma.tournament.update({
