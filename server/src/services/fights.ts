@@ -116,7 +116,8 @@ export async function doFight(
 
   if (arenaFight) {
     if (generatedFight.winner === brute1.name) {
-      xpGained = Math.max(WIN_XP - (Math.floor(levelDifference / 2)), LOSE_XP);
+      const buff = levelDifference < 0 ? levelDifference + 1 : levelDifference;
+      xpGained = Math.max(WIN_XP - (Math.floor(buff / 2)), LOSE_XP);
     } else {
       xpGained = LOSE_XP;
     }
@@ -129,8 +130,16 @@ export async function doFight(
       { where: { user: { isNot: null }, deletedAt: null }, orderBy: { level: 'desc' } },
     );
 
+    const maxRankBrute = await prisma.brute.findFirst(
+      { where: { user: { isNot: null }, deletedAt: null }, orderBy: { ranking: 'desc' } },
+    );
+
     if (maxLevelBrute) {
       xpGained += Math.max(Math.floor((maxLevelBrute.level - brute1.level) / 5), 0);
+    }
+
+    if (maxRankBrute) {
+      xpGained += Math.max((brute1.ranking - maxRankBrute.ranking), 0);
     }
   }
 

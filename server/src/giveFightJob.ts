@@ -1,9 +1,7 @@
-import { getMaxFightsPerDay } from '@labrute/core';
+import { getMaxFightsPerDay, randomBetween } from '@labrute/core';
 import { PrismaClient } from '@labrute/prisma';
 
 const giveFightJob = (prisma: PrismaClient) => async () => {
-  console.log('Give fights');
-
   const brutes = await prisma.brute.findMany({
     where: {
       deletedAt: null,
@@ -17,7 +15,7 @@ const giveFightJob = (prisma: PrismaClient) => async () => {
           id: brute.id,
         },
         data: {
-          fightsLeft: { increment: 1 },
+          fightsLeft: { increment: 1 + (brute.skills.includes('regeneration') && randomBetween(0, 100) > 75 ? 1 : 0) },
         },
       }).catch(console.error);
     }

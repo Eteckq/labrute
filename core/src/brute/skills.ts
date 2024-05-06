@@ -266,7 +266,7 @@ const skills: Skill[] = [
   },
   {
     name: 'backup',
-    odds: 5,
+    odds: 0,
     type: 'talent',
   },
   {

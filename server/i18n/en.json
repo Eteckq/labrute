@@ -172,7 +172,7 @@
   "tamer.effect": "Action (x4) Ta brute récupère entre 20 et 50% de son énergie selon la qualité de la viande.",
   "regeneration": "Régénération",
   "regeneration.desc": "Grâce à ta capacité de cicatrisation hors normes, tu ne rates jamais un combat !",
-  "regeneration.effect": "WIP - CE SKILL EST USELESS, NE PRENDS PAS CETTE MERDE",
+  "regeneration.effect": "Tu as 25% de chance d'avoir un combat supplémentaire",
   "chef": "Cuisinier",
   "chef.desc": "Toutes les brutes le savent, le gros du combat se joue avant l'arène. Le plus souvent du côté de la cantine !",
   "chef.effect": "Tes adversaires subissent 2% de dégâts à la fin de chacune de leurs actions.",
