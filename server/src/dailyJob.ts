@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop */
 import {
-  Fighter, getRandomBody,
+  Fighter,
 } from '@labrute/core';
 import {
   LogType, Prisma, PrismaClient, TournamentType,
@@ -12,25 +12,6 @@ import generateFight from './utils/fight/generateFight.js';
 import shuffle from './utils/shuffle.js';
 
 const GENERATE_TOURNAMENTS_IN_DEV = true;
-
-const getColors = (color: string) => ({
-  col0: color,
-  col0a: color,
-  col0c: color,
-  col1: color,
-  col1a: color,
-  col1b: color,
-  col1c: color,
-  col1d: color,
-  col2: color,
-  col2a: color,
-  col2b: color,
-  col3: color,
-  col3b: color,
-  col4: color,
-  col4a: color,
-  col4b: color,
-});
 
 const grantBetaAchievement = async (prisma: PrismaClient) => {
   // Grant beta achievement to all brutes who don't have it yet
@@ -134,42 +115,6 @@ const deleteMisformattedTournaments = async (prisma: PrismaClient) => {
         id: {
           in: misformattedTournaments.map((tournament) => tournament.id),
         },
-      },
-    });
-  }
-};
-
-const generateBotColors = async (prisma: PrismaClient) => {
-  const bots = await prisma.brute.findMany({
-    where: {
-      user: null,
-    },
-    select: { id: true, gender: true },
-  });
-
-  for (const brute of bots) {
-    await prisma.brute.update({
-      where: {
-        id: brute.id,
-      },
-      data: {
-        colors: { update: getColors('#42fc86') },
-      },
-      select: { id: true },
-    });
-  }
-
-  const users = await prisma.user.findMany({
-    select: { id: true },
-  });
-
-  for (const user of users) {
-    await prisma.user.update({
-      where: {
-        id: user.id,
-      },
-      data: {
-        gold: 0,
       },
     });
   }
@@ -500,6 +445,12 @@ const handleDailyTournaments = async (prisma: PrismaClient) => {
           select: { id: true },
         });
       }
+    } else if (winnerBrute.ranking > 1) {
+      await prisma.brute.update({
+        where: { id: winnerBrute.id },
+        data: { canRankUpSince: null, ranking: { decrement: 1 } },
+        select: { id: true },
+      });
     }
 
     // Send Discord notification
@@ -911,9 +862,6 @@ const handleTournamentEarnings = async (prisma: PrismaClient) => {
 
 const dailyJob = (prisma: PrismaClient) => async () => {
   try {
-    // Generate missing body and colors
-    await generateBotColors(prisma);
-
     if (process.env.NODE_ENV === 'production' || GENERATE_TOURNAMENTS_IN_DEV) {
       // Update server state to hold traffic
       await ServerState.setReady(prisma, false);
@@ -943,8 +891,6 @@ const dailyJob = (prisma: PrismaClient) => async () => {
     // Handle tournament earnings from the previous day
     await handleTournamentEarnings(prisma);
   } catch (error: unknown) {
-    console.log(error);
-    
     if (!(error instanceof Error)) {
       throw error;
     }
