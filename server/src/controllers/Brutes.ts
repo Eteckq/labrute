@@ -480,14 +480,45 @@ const Brutes = {
         select: { id: true },
       });
 
+      // Get first bonus
+      const firstBonus = await prisma.destinyChoice.findFirst({
+        where: {
+          bruteId: brute.id,
+          path: { equals: [] },
+        },
+      });
+
+      if (!firstBonus) {
+        throw new Error(translate('noFirstBonus', user));
+      }
+
+      // Random stats
+      const stats = createRandomBruteStats(
+        firstBonus.type,
+        firstBonus.type === DestinyChoiceType.pet
+          ? firstBonus.pet
+          : firstBonus.type === DestinyChoiceType.weapon
+            ? firstBonus.weapon
+            : firstBonus.skill,
+      );
+
+      const getTotalXP = (targetLevel: number) => {
+        let totalXP = 0;
+        for (let level = 2; level <= targetLevel; level++) {
+          totalXP += getXPNeeded(level);
+        }
+        return totalXP;
+      };
+
       // Update the brute
       const updatedBrute = await prisma.brute.update({
         where: { id: brute.id },
         data: {
+          ...stats,
           destinyPath: [],
           previousDestinyPath: brute.destinyPath,
           level: 1,
-          xp: 500, // TODO
+          xp: getTotalXP(brute.level) + brute.xp,
         },
         include: {
           master: {

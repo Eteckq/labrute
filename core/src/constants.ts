@@ -7,6 +7,8 @@ export const MAX_STACK_FIGHTS = 6;
 export const WIN_XP = 5;
 export const LOSE_XP = 3;
 
+export const TOURNAMENT_GLOBAL_GOLD_PER_WIN = 3;
+
 export const ARENA_OPPONENTS_COUNT = 8;
 export const ARENA_OPPONENTS_MAX_GAP = 5;
 

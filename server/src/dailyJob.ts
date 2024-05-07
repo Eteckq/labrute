@@ -1,6 +1,7 @@
 /* eslint-disable no-await-in-loop */
 import {
   Fighter,
+  TOURNAMENT_GLOBAL_GOLD_PER_WIN,
   randomBetween,
 } from '@labrute/core';
 import {
@@ -371,7 +372,7 @@ const handleDailyTournaments = async (prisma: PrismaClient) => {
 
         // Get fight winner
         const winnerId = lastFight.winner === brute1.name ? brute1.id : brute2.id;
-
+        const userWinnerId = lastFight.winner === brute1.name ? brute1.userId : brute2.userId;
         // Add winner to next round
         winners.push(winnerId === roundBrutes[i].id ? roundBrutes[i] : roundBrutes[i + 1]);
 
@@ -386,7 +387,9 @@ const handleDailyTournaments = async (prisma: PrismaClient) => {
         });
 
         // Store XP for winner
-        xpGains[winnerId] = (xpGains[winnerId] || 0) + 1;
+        if (userWinnerId) {
+          xpGains[winnerId] = (xpGains[winnerId] || 0) + 1;
+        }
 
         step++;
       }
@@ -649,9 +652,36 @@ const handleGlobalTournament = async (prisma: PrismaClient) => {
       });
 
       const winnerId = brute1.name === generatedFight.winner ? brute1.id : brute2.id;
-
+      const userWinnerId = brute1.name === generatedFight.winner ? brute1.userId : brute2.userId;
       // Store XP for winner
       xpGains[winnerId] = (xpGains[winnerId] || 0) + 1;
+
+      if (userWinnerId) {
+        const currentTGolde = await prisma.tournamentGold.findFirst({
+          where: {
+            userId: userWinnerId,
+          },
+        });
+
+        if (!currentTGolde) {
+          await prisma.tournamentGold.create({
+            data: {
+              userId: userWinnerId,
+              date: today.toDate(),
+              gold: TOURNAMENT_GLOBAL_GOLD_PER_WIN,
+            },
+          });
+        } else {
+          await prisma.tournamentGold.update({
+            where: {
+              id: currentTGolde.id,
+            },
+            data: {
+              gold: { increment: TOURNAMENT_GLOBAL_GOLD_PER_WIN },
+            },
+          });
+        }
+      }
     }
 
     // Add byes to next round
@@ -669,24 +699,9 @@ const handleGlobalTournament = async (prisma: PrismaClient) => {
     throw new Error('Invalid tournament');
   }
 
-  // Get winner user
-  const winnerUser = await prisma.user.findFirst({
-    where: { brutes: { some: { id: roundBrutes[0].id } } },
-    select: { id: true },
-  });
-
-  if (!winnerUser) {
+  if (!roundBrutes[0]) {
     throw new Error('Winner user not found');
   }
-
-  await prisma.tournamentGold.create({
-    data: {
-      userId: winnerUser.id,
-      date: today.toDate(),
-      gold: 30,
-    },
-    select: { id: true },
-  });
 
   if (randomBetween(0, 100) > 90) {
     // Give free visual reset
