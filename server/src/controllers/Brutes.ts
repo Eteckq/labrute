@@ -11,6 +11,7 @@ import {
   DestinyBranch, ExpectedError,
   HookBrute,
   MAX_FAVORITE_BRUTES,
+  REROLL_PRICE,
   RESET_PRICE,
   createRandomBruteStats,
   getBruteGoldValue,
@@ -462,70 +463,64 @@ const Brutes = {
       const brute = user.brutes.find((b) => b.name === req.params.name);
 
       if (!brute) {
-        throw new ExpectedError(translate('bruteNotFound', user));
+        throw new Error(translate('bruteNotFound', user));
       }
 
-      // Check if brute is master of a clan
-      const isClanMaster = await prisma.clan.count({
-        where: {
-          masterId: brute.id,
-        },
-      });
-
-      if (isClanMaster) {
-        throw new ExpectedError(translate('cannotSacrificeClanMaster', user));
+      // Check if user has enough gold
+      if (user.gold < RESET_PRICE) {
+        throw new ExpectedError(translate('notEnoughGold', user));
       }
 
-      // Add Gold to user
-      const gold = getBruteGoldValue(brute);
+      // Remove gold from user
       await prisma.user.update({
         where: { id: user.id },
         data: {
-          gold: { increment: gold },
+          gold: { decrement: RESET_PRICE },
         },
         select: { id: true },
       });
 
-      // Decrease master's pupils count
-      if (brute.masterId) {
-        await prisma.brute.update({
-          where: { id: brute.masterId },
-          data: {
-            pupilsCount: { decrement: 1 },
-          },
-          select: { id: true },
-        });
-      }
-
-      // Remove pupils master
-      await prisma.brute.updateMany({
-        where: { masterId: brute.id },
-        data: {
-          masterId: null,
-        },
-      });
-
-      // Set brute as deleted
-      await prisma.brute.update({
+      // Update the brute
+      const updatedBrute = await prisma.brute.update({
         where: { id: brute.id },
         data: {
-          deletedAt: new Date(),
-          clanId: null,
-          // Delete join request
-          wantToJoinClanId: null,
+          destinyPath: [],
+          previousDestinyPath: brute.destinyPath,
+          level: 1,
+          xp: 500, // TODO
         },
-        select: { id: true },
+        include: {
+          master: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          body: true,
+          colors: true,
+          clan: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          user: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          tournaments: {
+            where: {
+              type: TournamentType.DAILY,
+              date: moment.utc().startOf('day').toDate(),
+            },
+          },
+          inventory: true,
+        },
       });
 
-      // Update clan points
-      if (brute.clanId) {
-        await updateClanPoints(prisma, brute.clanId, 'remove', brute);
-      }
-
-      // Achievement
-      await increaseAchievement(prisma, user.id, null, 'sacrifice');
-
-      res.send({ gold });
+      res.send({ gold: RESET_PRICE, newBrute: updatedBrute });
     } catch (error) {
       sendError(res, error);
     }
@@ -798,7 +793,7 @@ const Brutes = {
       await prisma.user.update({
         where: { id: user.id },
         data: {
-          gold: { increment: RESET_PRICE * 2 },
+          gold: { increment: REROLL_PRICE * 2 },
         },
       });
 
@@ -1244,7 +1239,7 @@ const Brutes = {
       }
 
       // Check if user has enough gold
-      if (user.gold < RESET_PRICE) {
+      if (user.gold < REROLL_PRICE) {
         throw new ExpectedError(translate('notEnoughGold', user));
       }
 
@@ -1252,7 +1247,7 @@ const Brutes = {
       await prisma.user.update({
         where: { id: user.id },
         data: {
-          gold: { decrement: RESET_PRICE },
+          gold: { decrement: REROLL_PRICE },
         },
         select: { id: true },
       });

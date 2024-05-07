@@ -1,4 +1,4 @@
-import { RESET_PRICE, getBruteGoldValue } from '@labrute/core';
+import { REROLL_PRICE, RESET_PRICE } from '@labrute/core';
 import { BruteReportReason } from '@labrute/prisma';
 import { History } from '@mui/icons-material';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
@@ -48,20 +48,19 @@ const CellView = () => {
   const confirmSacrifice = useCallback(() => {
     if (!brute) return;
 
-    Confirm.open(t('sacrifice'), t('sacrificeConfirm', { gold: getBruteGoldValue(brute) }), () => {
-      Server.Brute.sacrifice(brute.name).then(({ gold }) => {
+    Confirm.open(t('sacrifice'), t('sacrificeConfirm', { gold: RESET_PRICE }), () => {
+      Server.Brute.sacrifice(brute.name).then(({ gold, newBrute }) => {
         Alert.open('success', t('sacrificeSuccess', { gold }));
-        navigate('/');
 
         // Update user data
         updateData((data) => (data ? ({
           ...data,
-          gold: (data.gold || 0) + gold,
-          brutes: data.brutes.filter((b) => b.name !== brute.name) || [],
+          gold: (data.gold || 0) - gold,
         }) : null));
+        updateBrute(newBrute);
       }).catch(catchError(Alert));
     });
-  }, [Alert, Confirm, brute, navigate, t, updateData]);
+  }, [Alert, Confirm, brute, t, updateBrute, updateData]);
 
   const switchBrute = useCallback((side: number) => {
     if (!user || !brute || !user.brutes || !ownsBrute) return;
@@ -82,14 +81,14 @@ const CellView = () => {
   const confirmReset = useCallback(() => {
     if (!brute) return;
 
-    Confirm.open(t('reset'), t('resetConfirm', { gold: RESET_PRICE }), () => {
+    Confirm.open(t('reset'), t('resetConfirm', { gold: REROLL_PRICE }), () => {
       Server.Brute.reset(brute.name).then((newBrute) => {
         Alert.open('success', t('resetSuccess'));
 
         // Update user data
         updateData((data) => (data ? ({
           ...data,
-          gold: data.gold - RESET_PRICE,
+          gold: data.gold - REROLL_PRICE,
           brutes: data.brutes.map((b) => (b.name === brute.name ? newBrute : b)),
         }) : null));
 
