@@ -679,15 +679,14 @@ const handleGlobalTournament = async (prisma: PrismaClient) => {
     throw new Error('Winner user not found');
   }
 
-  // Add 30 Gold to the winner user
-  // await prisma.tournamentGold.create({
-  //   data: {
-  //     userId: winnerUser.id,
-  //     date: today.toDate(),
-  //     gold: 30,
-  //   },
-  //   select: { id: true },
-  // });
+  await prisma.tournamentGold.create({
+    data: {
+      userId: winnerUser.id,
+      date: today.toDate(),
+      gold: 30,
+    },
+    select: { id: true },
+  });
 
   if (randomBetween(0, 100) > 90) {
     // Give free visual reset
