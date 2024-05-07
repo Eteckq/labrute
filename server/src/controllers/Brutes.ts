@@ -554,7 +554,7 @@ const Brutes = {
         rank = +req.params.rank;
       }
 
-      // Get first 15 brutes of the same rank with the highest level and XP
+      // Get first 50 brutes of the same rank with the highest level and XP
       const topBrutes = await prisma.brute.findMany({
         where: {
           ranking: rank,
@@ -565,7 +565,7 @@ const Brutes = {
           { level: 'desc' },
           { xp: 'desc' },
         ],
-        take: 15,
+        take: 50,
         include: { body: true, colors: true },
       });
 
