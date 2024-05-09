@@ -1,4 +1,4 @@
-import { ExpectedError, LOSE_XP, WIN_XP } from '@labrute/core';
+import { ExpectedError, LOSE_XP, WIN_XP, getXPNeeded } from '@labrute/core';
 import {
   PrismaClient, Prisma, User,
 } from '@labrute/prisma';
@@ -110,7 +110,20 @@ export async function doFight(
     select: { id: true, winner: true, loser: true },
   });
 
-  const levelDifference = brute1.level - brute2.level;
+  function getRealLevel(level: number, xp: number) {
+    let total = xp;
+    let realLevel = level;
+
+    while (total > 0) {
+      total -= getXPNeeded(realLevel++);
+    }
+
+    return realLevel - 1;
+  }
+
+  const realLevel = getRealLevel(brute1.level, brute1.xp);
+
+  const levelDifference = realLevel - brute2.level;
 
   let xpGained = 0;
 
