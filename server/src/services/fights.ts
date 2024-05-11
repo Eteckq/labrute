@@ -144,7 +144,7 @@ export async function doFight(
     );
 
     const maxRankBrute = await prisma.brute.findFirst(
-      { where: { user: { isNot: null }, deletedAt: null }, orderBy: { ranking: 'desc' } },
+      { where: { user: { isNot: null }, deletedAt: null }, orderBy: { ranking: 'asc' } },
     );
 
     if (maxLevelBrute) {
