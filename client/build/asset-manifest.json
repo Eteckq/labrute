@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.d4b3bdfe.css",
-    "main.js": "/static/js/main.be4fa1f6.js",
+    "main.js": "/static/js/main.f28f6056.js",
     "static/media/Movavi_Grotesque_Black.ttf": "/static/media/Movavi_Grotesque_Black.05b680766d7517ed4c82.ttf",
     "static/media/BarcadeBrawlRegular.ttf": "/static/media/BarcadeBrawlRegular.73895ecd83170778cce0.ttf",
     "static/media/acmesa.ttf": "/static/media/acmesa.01318c0afdf644ca4a70.ttf",
@@ -12,10 +12,10 @@
     "static/media/Blocky.woff": "/static/media/Blocky.f65d33e31329e7a10c3f.woff",
     "index.html": "/index.html",
     "main.d4b3bdfe.css.map": "/static/css/main.d4b3bdfe.css.map",
-    "main.be4fa1f6.js.map": "/static/js/main.be4fa1f6.js.map"
+    "main.f28f6056.js.map": "/static/js/main.f28f6056.js.map"
   },
   "entrypoints": [
     "static/css/main.d4b3bdfe.css",
-    "static/js/main.be4fa1f6.js"
+    "static/js/main.f28f6056.js"
   ]
 }
