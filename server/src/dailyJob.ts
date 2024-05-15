@@ -133,11 +133,15 @@ const handleDailyTournaments = async (prisma: PrismaClient) => {
   // Delete misformatted tournaments
   await deleteMisformattedTournaments(prisma);
 
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+
   // Get brutes who registered today and are not in a tournament
   const registeredBrutes = await prisma.brute.findMany({
     where: {
       deletedAt: null,
       user: { isNot: null },
+      lastFight: { gte: d },
       tournaments: {
         none: {
           type: TournamentType.DAILY,
@@ -168,7 +172,7 @@ const handleDailyTournaments = async (prisma: PrismaClient) => {
         deletedAt: null,
         userId: null,
         level: {
-          gte: 8,
+          lte: 30,
         },
         tournaments: {
           none: {
@@ -187,6 +191,7 @@ const handleDailyTournaments = async (prisma: PrismaClient) => {
         name: true,
         userId: true,
       },
+      orderBy: { level: 'desc' },
       take: 64 - registeredBrutes.length,
     });
 

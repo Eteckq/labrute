@@ -518,6 +518,7 @@ const Brutes = {
           destinyPath: [],
           previousDestinyPath: brute.destinyPath,
           level: 1,
+          ranking: brute.ranking,
           xp: getTotalXP(brute.level) + brute.xp,
         },
         include: {
@@ -1289,6 +1290,7 @@ const Brutes = {
         data: {
           ...createRandomBruteStats(),
           destinyPath: [],
+          ranking: brute.ranking,
           // Reset fights left
           fightsLeft: getMaxFightsPerDay(),
         },
