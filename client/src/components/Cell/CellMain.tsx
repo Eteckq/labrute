@@ -17,6 +17,7 @@ import StyledButton from '../StyledButton';
 import Text from '../Text';
 import CellGlobalTournament from './CellGlobalTournament';
 import CellTournament from './CellTournament';
+import CountdownTimer from './Countdown';
 
 export interface CellMainProps extends BoxProps {
   language: Lang;
@@ -104,7 +105,7 @@ const CellMain = ({
       ) : (
         <Box sx={{ textAlign: 'center' }}>
           <Text bold color="error">{t('bruteIsResting', { brute: brute.name })}</Text>
-          <Text color="error">Reviens dans quelques heures pour ton prochain combat</Text>
+          <CountdownTimer />
         </Box>
       ) : (
         <Link to={`/${brute.name}/level-up`}>
