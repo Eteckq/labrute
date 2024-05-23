@@ -288,6 +288,23 @@ const CellView = () => {
               mt: -7,
             }}
             >
+              {(user?.id !== brute.user?.id && user?.brutes[0]) && (
+              <Paper
+                sx={{
+                  p: 1,
+                  mr: 0,
+                  ml: 4,
+                  bgcolor: 'background.paperAccent',
+                  textAlign: 'center',
+                }}
+              >
+                <Text bold component="span">
+                  <Link to={`/${user?.brutes[0].name}/cell`}>
+                    Cellule de {user?.brutes[0].name}
+                  </Link>
+                </Text>
+              </Paper>
+              )}
               {/* LOGS */}
               <Box sx={{ ml: 2, mt: 1 }}>
                 {logs.map((log) => <CellLog key={log.id} log={log} />)}

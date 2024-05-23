@@ -6,18 +6,20 @@ import { useTranslation } from 'react-i18next';
 import { Link as RouterLink } from 'react-router-dom';
 import { useLanguage } from '../hooks/useLanguage';
 import Text from './Text';
+import { useAuth } from '../hooks/useAuth';
 
 export interface HeaderProps extends BoxProps {
   url?: string;
 }
 
 const Header = ({
-  url,
   ...rest
 }: HeaderProps) => {
   const { t } = useTranslation();
   const { language } = useLanguage();
   const [time, setTime] = React.useState(moment.utc());
+  const { user } = useAuth();
+  const url = user ? `/${user?.brutes[0].name}/cell` : '/';
 
   // Randomized left art
   const leftArt = useMemo(() => Math.floor(Math.random() * (11 - 1 + 1) + 1), []);
@@ -57,7 +59,7 @@ const Header = ({
           width: '23.118279569%',
         }}
       />
-      <Link component={RouterLink} to={url || '/'}>
+      <Link component={RouterLink} to={url}>
         <Box
           component="img"
           src={`/images/${language}/header/head.png`}
