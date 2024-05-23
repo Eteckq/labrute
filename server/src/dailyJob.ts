@@ -142,6 +142,7 @@ const handleDailyTournaments = async (prisma: PrismaClient) => {
       deletedAt: null,
       user: { isNot: null },
       lastFight: { gte: d },
+      canRankUpSince: null,
       tournaments: {
         none: {
           type: TournamentType.DAILY,

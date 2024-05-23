@@ -12,8 +12,6 @@ const CountdownTimer = () => {
       nextActionHour = 0;
     }
 
-    console.log(now, nextActionHour);
-
     const nextActionTime = new Date(now);
     nextActionTime.setHours(nextActionHour, 0, 0, 0);
 
@@ -23,9 +21,13 @@ const CountdownTimer = () => {
       nextActionTime.setDate(nextActionTime.getDate() + 1);
     }
 
-    const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    let hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+
+    if (hours > 3) {
+      hours -= 3;
+    }
 
     return { hours, minutes, seconds };
   }
