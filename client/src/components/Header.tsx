@@ -19,7 +19,7 @@ const Header = ({
   const { language } = useLanguage();
   const [time, setTime] = React.useState(moment.utc());
   const { user } = useAuth();
-  const url = user ? `/${user?.brutes[0].name}/cell` : '/';
+  const url = user && user.brutes.length > 0 ? `/${user?.brutes[0].name}/cell` : '/';
 
   // Randomized left art
   const leftArt = useMemo(() => Math.floor(Math.random() * (11 - 1 + 1) + 1), []);
