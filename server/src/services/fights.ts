@@ -139,21 +139,14 @@ export async function doFight(
       xpGained -= 1;
     }
 
-    const maxLevelBrute = await prisma.brute.findFirst(
-      { where: { user: { isNot: null }, deletedAt: null, ranking: { lte: brute1.ranking } }, orderBy: { level: 'desc' } },
-    );
-
     const maxRankBrute = await prisma.brute.findFirst(
       { where: { user: { isNot: null }, deletedAt: null }, orderBy: { ranking: 'asc' } },
     );
 
-    if (maxLevelBrute) {
-      xpGained += Math.max(Math.floor((maxLevelBrute.level - brute1.level) / 5), 0);
-    }
-
     if (maxRankBrute) {
       xpGained += Math.max((brute1.ranking - maxRankBrute.ranking), 0);
     }
+    xpGained = Math.min(xpGained, 10);
   }
 
   // Update brute XP and victories if arena fight

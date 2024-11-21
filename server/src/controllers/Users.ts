@@ -315,6 +315,7 @@ const Users = {
               body: true,
               colors: true,
               ranking: true,
+              trophy: true,
             },
             where: {
               deletedAt: null,

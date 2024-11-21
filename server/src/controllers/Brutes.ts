@@ -817,10 +817,6 @@ const Brutes = {
         throw new ExpectedError(translate('bruteCannotRankUp', user));
       }
 
-      if (userBrute.ranking === 0) {
-        throw new ExpectedError(translate('bruteAlreadyMaxRank', user));
-      }
-
       // Give 100 gold
       await prisma.user.update({
         where: { id: user.id },
@@ -835,7 +831,10 @@ const Brutes = {
         data: {
           ...createRandomBruteStats(),
           // Rank up
-          ranking: userBrute.ranking - 1,
+          ranking: userBrute.ranking !== 0 ? userBrute.ranking - 1 : 0,
+          trophy: {
+            increment: userBrute.ranking === 0 ? 1 : 0,
+          },
           canRankUpSince: null,
           destinyPath: [],
           // Reset fights left

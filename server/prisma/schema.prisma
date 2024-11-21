@@ -181,6 +181,7 @@ model Brute {
   previousDestinyPath          DestinyChoiceSide[]     @default([])
   level                        Int                     @default(1)
   xp                           Int                     @default(0)
+  trophy                       Int                     @default(0)
   hp                           Int                     @default(0)
   enduranceStat                Int                     @default(0)
   enduranceModifier            Float                   @default(1)

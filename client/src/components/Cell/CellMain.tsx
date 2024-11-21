@@ -74,13 +74,15 @@ const CellMain = ({
         {/* RANKING */}
         <Box sx={{ width: 140, display: 'flex', flexDirection: 'row' }}>
           <Box component="img" src={`/images/rankings/lvl_${brute.ranking}.png`} />
-          <Text bold color="secondary" sx={{ pl: 0.5 }}>{t(`lvl_${brute.ranking as BruteRanking}`)}</Text>
+          <Text bold color="secondary" sx={{ pl: 0.1 }}>{t(`lvl_${brute.ranking as BruteRanking}`)}</Text>
+          {brute.trophy > 0 && (
+            <Text bold color="secondary" sx={{ pl: 0.3 }}>x{brute.trophy + 1}</Text>
+          )}
         </Box>
       </Box>
       <BruteBodyAndStats brute={brute} sx={{ mb: 1 }} />
-
       {/* Rank up */}
-      {owner && brute.canRankUpSince && brute.ranking > 0 && (!moment.utc(brute.canRankUpSince).isSame(moment.utc(), 'day') || brute.currentTournamentStepWatched === 6) && (
+      {owner && brute.canRankUpSince && (!moment.utc(brute.canRankUpSince).isSame(moment.utc(), 'day') || brute.currentTournamentStepWatched === 6) && (
         <FantasyButton color="success" onClick={rankUp} sx={{ mb: 1 }}>
           {t('rankUp')}
         </FantasyButton>

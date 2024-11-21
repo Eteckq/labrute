@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Brute" ADD COLUMN     "trophy" INTEGER NOT NULL DEFAULT 0;
