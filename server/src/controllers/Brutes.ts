@@ -879,7 +879,7 @@ const Brutes = {
         data: {
           date: new Date(),
           currentBruteId: brute.id,
-          type: LogType.lvl,
+          type: userBrute.ranking !== 0 ? LogType.lvl : LogType.trophy,
           level: brute.ranking,
         },
         select: { id: true },

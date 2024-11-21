@@ -269,6 +269,7 @@ enum LogType {
   childup
   up
   lvl
+  trophy
   survive
   tournament
   tournamentXp

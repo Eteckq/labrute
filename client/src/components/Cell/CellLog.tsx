@@ -54,8 +54,10 @@ const CellLog = ({ log, sx, ...rest }: CellLogProps) => {
             : log.type === LogType.lvl
               ? `rankings/lvl_${log.level || BruteRankings[0]}`
               : log.type === LogType.tournament
-                ? 'log/lose'
-                : log.type === LogType.tournamentXp ? 'log/childup' : `log/${log.type}`}.png`}
+                ? 'lose'
+                : log.type === LogType.trophy
+                  ? 'rankings/ear'
+                  : log.type === LogType.tournamentXp ? 'log/childup' : `log/${log.type}`}.png`}
         />
       </Box>
       <Box

@@ -47,6 +47,7 @@
   "log.childup": "Ton élève {{value}} est passé au niveau suivant.",
   "log.up": "Ta brute a gagné un niveau.",
   "log.lvl": "Ta brute a atteint le rang",
+  "log.trophy": "Ta brute a gagné un trophée",
   "log.tournament": "Le tournoi du {{date}} a été annulé, retente ta chance !",
   "log.tournamentXp": "Tournois d'hier",
   "lvl_0": "Légende Brutale",
