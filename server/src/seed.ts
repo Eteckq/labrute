@@ -5,7 +5,6 @@ import {
   MAX_STACK_FIGHTS,
   createRandomBruteStats,
   getLevelUpChoices, getRandomBody,
-  getRandomColors,
   updateBruteData,
 } from '@labrute/core';
 import { Gender, Prisma } from '@labrute/prisma';
@@ -34,7 +33,24 @@ const generateBrute = (
       create: getRandomBody(gender),
     },
     colors: {
-      create: getRandomColors(gender),
+      create: {
+        col0: '0x00f000',
+        col0a: '0x00f000',
+        col0c: '0x00f000',
+        col1: '0x00f000',
+        col1a: '0x00f000',
+        col1b: '0x00f000',
+        col1c: '0x00f000',
+        col1d: '0x00f000',
+        col2: '0x00f000',
+        col2a: '0x00f000',
+        col2b: '0x00f000',
+        col3: '0x00f000',
+        col3b: '0x00f000',
+        col4: '0x00f000',
+        col4a: '0x00f000',
+        col4b: '0x00f000',
+      },
     },
     victories: 0,
     pupilsCount: 0,
@@ -73,6 +89,33 @@ async function main(cx: ServerContext) {
   });
 
   if (count >= ARENA_OPPONENTS_COUNT * 100) {
+    await cx.prisma.brute.update({
+      where: { userId: null },
+      data: {
+        colors: {
+          update: {
+            col0: '0x00f000',
+            col0a: '0x00f000',
+            col0c: '0x00f000',
+            col1: '0x00f000',
+            col1a: '0x00f000',
+            col1b: '0x00f000',
+            col1c: '0x00f000',
+            col1d: '0x00f000',
+            col2: '0x00f000',
+            col2a: '0x00f000',
+            col2b: '0x00f000',
+            col3: '0x00f000',
+            col3b: '0x00f000',
+            col4: '0x00f000',
+            col4a: '0x00f000',
+            col4b: '0x00f000',
+          },
+        },
+      },
+      select: { id: true },
+    });
+    cx.logger.log(`${count} changed`);
     return;
   }
 
