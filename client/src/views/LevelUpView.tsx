@@ -15,6 +15,8 @@ import { useAlert } from '../hooks/useAlert';
 import { useAuth } from '../hooks/useAuth';
 import Server from '../utils/Server';
 import catchError from '../utils/catchError';
+import { useConfirm } from '../hooks/useConfirm';
+import FantasyButton from '../components/FantasyButton';
 
 const LevelUpView = () => {
   const { t } = useTranslation();
@@ -69,6 +71,19 @@ const LevelUpView = () => {
 
     navigate(`/${brute.name}/cell`);
   }, [Alert, brute, choices, navigate, updateData]);
+
+  const Confirm = useConfirm();
+
+  const reroll = useCallback(() => {
+    if (!brute) return;
+
+    Confirm.open('Reroll choices', 'Changez vos choix pour 50 golds', () => {
+      Server.Brute.rerollCurrentChoices(brute.name).then(() => {
+        // Reload page
+        window.location.reload();
+      }).catch(catchError(Alert));
+    });
+  }, [Alert, Confirm, brute]);
 
   return brute && (
     <Page title={`${t('MyBrute')}. ${t('newLevelFor')} ${brute.name || ''}`} headerUrl={`/${brute.name}/cell`}>
@@ -194,6 +209,10 @@ const LevelUpView = () => {
                 </StyledButton>
               </Box>
             ))}
+
+            <FantasyButton color="success" onClick={reroll} sx={{ mb: 1 }}>
+              Reroll
+            </FantasyButton>
           </Box>
         </Box>
       </Paper>

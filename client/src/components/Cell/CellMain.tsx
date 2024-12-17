@@ -66,6 +66,18 @@ const CellMain = ({
     });
   }, [Alert, Confirm, brute, t]);
 
+  // Rank up 2
+  const rankUp2 = useCallback(() => {
+    if (!brute) return;
+
+    Confirm.open(t('rankUp'), 'Voulez-vous vraiment monter de rang ? Votre brute repassera au niveau 1 avec la même destinée. Cela vous coutera 50 golds', () => {
+      Server.Brute.rankUp2(brute.name).then(() => {
+        // Reload page
+        window.location.reload();
+      }).catch(catchError(Alert));
+    });
+  }, [Alert, Confirm, brute, t]);
+
   return brute && (
     <Box {...rest}>
       <Box display="flex" justifyContent="space-between" alignItems="flex-start" sx={{ mb: 2 }}>
@@ -85,6 +97,11 @@ const CellMain = ({
       {owner && brute.canRankUpSince && (!moment.utc(brute.canRankUpSince).isSame(moment.utc(), 'day') || brute.currentTournamentStepWatched === 6) && (
         <FantasyButton color="success" onClick={rankUp} sx={{ mb: 1 }}>
           {t('rankUp')}
+        </FantasyButton>
+      )}
+      {owner && brute.canRankUpSince && (!moment.utc(brute.canRankUpSince).isSame(moment.utc(), 'day') || brute.currentTournamentStepWatched === 6) && (
+        <FantasyButton color="success" onClick={rankUp2} sx={{ mb: 1 }}>
+          {t('rankUp')} avec la même brute
         </FantasyButton>
       )}
       {owner && (brute.xp < xpNeededForNextLevel ? fightsLeft > 0 ? (

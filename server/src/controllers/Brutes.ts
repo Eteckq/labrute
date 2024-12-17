@@ -794,6 +794,48 @@ const Brutes = {
       sendError(res, error);
     }
   },
+  rerollChoices: (prisma: PrismaClient) => async (
+    req: Request,
+    res: Response,
+  ) => {
+    try {
+      const user = await auth(prisma, req);
+
+      // Get brute
+      const brute = user.brutes.find((b) => b.name === req.params.name);
+
+      if (!brute) {
+        throw new Error(translate('bruteNotFound', user));
+      }
+
+      if (user.gold < 50) {
+        throw new ExpectedError(translate('notEnoughGold', user));
+      }
+
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          gold: { decrement: 50 },
+        },
+      });
+
+      // Get destiny choice
+      await prisma.destinyChoice.deleteMany({
+        where: {
+          bruteId: brute.id,
+          path: { equals: [...brute.destinyPath, 'LEFT'] },
+        },
+      });
+      await prisma.destinyChoice.deleteMany({
+        where: {
+          bruteId: brute.id,
+          path: { equals: [...brute.destinyPath, 'RIGHT'] },
+        },
+      });
+    } catch (error) {
+      sendError(res, error);
+    }
+  },
   rankUp: (prisma: PrismaClient) => async (
     req: Request,
     res: Response,
@@ -873,6 +915,227 @@ const Brutes = {
 
       // Update achievements for the first bonus
       await checkLevelUpAchievements(prisma, brute, destinyChoice);
+
+      // Add rank up log
+      await prisma.log.create({
+        data: {
+          date: new Date(),
+          currentBruteId: brute.id,
+          type: userBrute.ranking !== 0 ? LogType.lvl : LogType.trophy,
+          level: brute.ranking,
+        },
+        select: { id: true },
+      });
+
+      // Get new opponents
+      const opponents = await getOpponents(prisma, brute);
+
+      // Save opponents
+      await prisma.brute.update({
+        where: {
+          id: brute.id,
+        },
+        data: {
+          opponents: {
+            set: opponents.map((o) => ({
+              id: o.id,
+            })),
+          },
+          // Update opponentsGeneratedAt
+          opponentsGeneratedAt: new Date(),
+        },
+        select: { id: true },
+      });
+
+      // Get brutes that have this brute as opponent
+      const opponentOf = await prisma.brute.findMany({
+        where: {
+          opponents: {
+            some: {
+              id: brute.id,
+            },
+          },
+        },
+        select: {
+          id: true,
+          name: true,
+          level: true,
+          opponents: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      });
+
+      // Replace this brute in their opponents
+      for (const currentBrute of opponentOf) {
+        // Get same level random opponent
+        const bruteSearch = {
+          name: {
+            notIn: [
+              currentBrute.name,
+              ...currentBrute.opponents.map((o) => o.name),
+            ],
+          },
+          level: currentBrute.level,
+          deletedAt: null,
+        };
+        // eslint-disable-next-line no-await-in-loop
+        const bruteIds = await prisma.brute.findMany({
+          where: bruteSearch,
+          select: { id: true },
+        }).then((brutes) => brutes.map((b) => b.id));
+
+        let newOpponentId: number | null = null;
+
+        if (bruteIds.length === 0) {
+          // Search lower levels if no same level brutes
+          // eslint-disable-next-line no-await-in-loop
+          const lowerBruteIds = await prisma.brute.findMany({
+            where: {
+              ...bruteSearch,
+              level: {
+                lt: +brute.level,
+                gte: +brute.level - ARENA_OPPONENTS_MAX_GAP,
+              },
+            },
+            select: { id: true },
+          }).then((brutes) => brutes.map((b) => b.id));
+
+          if (lowerBruteIds.length > 0) {
+            // Select a random lower level opponent
+            newOpponentId = lowerBruteIds[randomBetween(0, lowerBruteIds.length - 1)];
+          }
+        } else {
+          // Select a new random opponent
+          newOpponentId = bruteIds[randomBetween(0, bruteIds.length - 1)];
+        }
+
+        if (newOpponentId) {
+          // Replace the brute with the new opponent
+          // eslint-disable-next-line no-await-in-loop
+          await prisma.brute.update({
+            where: { id: currentBrute.id },
+            data: {
+              opponents: {
+                set: [
+                  ...currentBrute.opponents
+                    .filter((o) => o.id !== brute?.id)
+                    .map((o) => ({ id: o.id })),
+                  { id: newOpponentId },
+                ],
+              },
+            },
+            select: { id: true },
+          });
+        } else {
+          // Remove the brute from the opponents if no opponent found
+          // eslint-disable-next-line no-await-in-loop
+          await prisma.brute.update({
+            where: { id: currentBrute.id },
+            data: {
+              opponents: {
+                set: currentBrute.opponents
+                  .filter((o) => o.id !== brute?.id)
+                  .map((o) => ({ id: o.id })),
+              },
+            },
+            select: { id: true },
+          });
+        }
+      }
+
+      // Update clan points
+      if (userBrute.clanId) {
+        await updateClanPoints(prisma, userBrute.clanId, 'add', brute, userBrute);
+      }
+
+      res.send({
+        success: true,
+      });
+    } catch (error) {
+      sendError(res, error);
+    }
+  },
+  rankUp2: (prisma: PrismaClient) => async (
+    req: Request,
+    res: Response,
+  ) => {
+    try {
+      const { params: { name } } = req;
+
+      const user = await auth(prisma, req);
+
+      if (user.gold < 50) {
+        throw new Error('Not enough gold');
+      }
+
+      if (!name) {
+        throw new Error(translate('missingName', user));
+      }
+
+      const userBrute = user.brutes.find((b) => b.name === name);
+
+      if (!userBrute) {
+        throw new Error(translate('bruteNotFound', user));
+      }
+
+      if (!userBrute.canRankUpSince) {
+        throw new ExpectedError(translate('bruteCannotRankUp', user));
+      }
+
+      // remove 50 gold
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          gold: { decrement: 50 },
+        },
+      });
+
+      // Get first bonus
+      const firstBonus = await prisma.destinyChoice.findFirst({
+        where: {
+          bruteId: userBrute.id,
+          path: { equals: [] },
+        },
+      });
+
+      if (!firstBonus) {
+        throw new Error(translate('noFirstBonus', user));
+      }
+
+      // Random stats
+      const stats = createRandomBruteStats(
+        firstBonus.type,
+        firstBonus.type === DestinyChoiceType.pet
+          ? firstBonus.pet
+          : firstBonus.type === DestinyChoiceType.weapon
+            ? firstBonus.weapon
+            : firstBonus.skill,
+      );
+
+      // Update the brute
+      const brute = await prisma.brute.update({
+        where: { id: userBrute.id },
+        data: {
+          ...stats,
+          // Rank up
+          ranking: userBrute.ranking !== 0 ? userBrute.ranking - 1 : 0,
+          trophy: {
+            increment: userBrute.ranking === 0 ? 1 : 0,
+          },
+          canRankUpSince: null,
+          destinyPath: [],
+          previousDestinyPath: userBrute.destinyPath,
+          // Reset fights left
+          fightsLeft: getMaxFightsPerDay(),
+        },
+      });
+
+      // Achievement
+      await increaseAchievement(prisma, user.id, brute.id, `rankUp${brute.ranking as 10 | 9 | 8 | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0}`);
 
       // Add rank up log
       await prisma.log.create({
