@@ -22,6 +22,7 @@ import {
 } from '@labrute/core';
 import {
   Brute,
+  DestinyChoice,
   DestinyChoiceSide, DestinyChoiceType, Gender,
   InventoryItemType, LogType, Prisma, PrismaClient, TournamentType,
 } from '@labrute/prisma';
@@ -812,6 +813,29 @@ const Brutes = {
         throw new ExpectedError(translate('notEnoughGold', user));
       }
 
+      // Check if next tree is known
+
+      const firstChoicePath = [...brute.destinyPath, DestinyChoiceSide.LEFT, DestinyChoiceSide.LEFT];
+      const secondChoicePath = [...brute.destinyPath, DestinyChoiceSide.RIGHT, DestinyChoiceSide.LEFT];
+
+      // Get destiny choices
+      const firstDestinyChoice = await prisma.destinyChoice.findFirst({
+        where: {
+          bruteId: brute.id,
+          path: { equals: firstChoicePath },
+        },
+      });
+      const secondDestinyChoice = await prisma.destinyChoice.findFirst({
+        where: {
+          bruteId: brute.id,
+          path: { equals: secondChoicePath },
+        },
+      });
+
+      if (firstDestinyChoice || secondDestinyChoice) {
+        throw new Error('Reroll can only be done on new tree branches');
+      }
+
       await prisma.user.update({
         where: { id: user.id },
         data: {
@@ -831,6 +855,10 @@ const Brutes = {
           bruteId: brute.id,
           path: { equals: [...brute.destinyPath, 'RIGHT'] },
         },
+      });
+      await new Promise(r => setTimeout(r, 500));
+      res.send({
+        success: true,
       });
     } catch (error) {
       sendError(res, error);

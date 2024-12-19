@@ -213,6 +213,7 @@ const LevelUpView = () => {
             <FantasyButton color="success" onClick={reroll} sx={{ mb: 1 }}>
               Reroll
             </FantasyButton>
+            *Possible only on new branches
           </Box>
         </Box>
       </Paper>
