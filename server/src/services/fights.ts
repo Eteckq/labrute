@@ -1,16 +1,18 @@
-import { ExpectedError, LOSE_XP, WIN_XP, getXPNeeded } from "@labrute/core";
-import { PrismaClient, Prisma, User } from "@labrute/prisma";
-import translate from "../utils/translate.js";
-import { LOGGER, DISCORD } from "../context.js";
-import generateFight from "../utils/fight/generateFight.js";
-import getOpponents from "../utils/brute/getOpponents.js";
+import {
+  ExpectedError, LOSE_XP, WIN_XP, getXPNeeded,
+} from '@labrute/core';
+import { PrismaClient, Prisma, User } from '@labrute/prisma';
+import translate from '../utils/translate.js';
+import { LOGGER, DISCORD } from '../context.js';
+import generateFight from '../utils/fight/generateFight.js';
+import getOpponents from '../utils/brute/getOpponents.js';
 
 export async function doFight(
   prisma: PrismaClient,
   user: User,
   brute1_name: string,
   brute2_name: string,
-  forceTraining: boolean = false
+  forceTraining: boolean = false,
 ) {
   // Get brutes
   const brute1 = await prisma.brute.findFirst({
@@ -28,7 +30,7 @@ export async function doFight(
     },
   });
   if (!brute1) {
-    throw new ExpectedError(translate("bruteNotFound", user));
+    throw new ExpectedError(translate('bruteNotFound', user));
   }
 
   const brute2 = await prisma.brute.findFirst({
@@ -42,12 +44,11 @@ export async function doFight(
     },
   });
   if (!brute2) {
-    throw new ExpectedError(translate("bruteNotFound", user));
+    throw new ExpectedError(translate('bruteNotFound', user));
   }
   // Check if this is an arena fight
-  let arenaFight =
-    brute1.opponents.some((opponent) => opponent.name === brute2.name) &&
-    brute1.fightsLeft > 0;
+  let arenaFight = brute1.opponents.some((opponent) => opponent.name === brute2.name)
+    && brute1.fightsLeft > 0;
   if (forceTraining) {
     arenaFight = false;
   }
@@ -80,7 +81,7 @@ export async function doFight(
         brute2,
         true,
         arenaFight,
-        false
+        false,
       );
     } catch (error) {
       if (!(error instanceof Error)) {
@@ -91,7 +92,7 @@ export async function doFight(
         expectedError = error;
       } else {
         LOGGER.log(
-          `Error while generating fight between ${brute1.name} and ${brute2.name}, retrying...`
+          `Error while generating fight between ${brute1.name} and ${brute2.name}, retrying...`,
         );
         DISCORD.sendError(error);
       }
@@ -139,11 +140,27 @@ export async function doFight(
 
     const maxRankBrute = await prisma.brute.findFirst({
       where: { user: { isNot: null }, deletedAt: null },
-      orderBy: { ranking: "asc" },
+      orderBy: { ranking: 'asc' },
     });
+    let ratioDifference = 0;
+    if (brute1.userId) {
+      const maxLevelBrute = await prisma.brute.findFirst({
+        where: {
+          userId: { not: brute1.userId },
+          deletedAt: null,
+        },
+        orderBy: { level: 'desc' },
+      });
+      if (maxLevelBrute) {
+        const differenceLevelWithMaxBrute = brute1.level - maxLevelBrute.level;
+        if (differenceLevelWithMaxBrute > 5) {
+          ratioDifference = Math.round((differenceLevelWithMaxBrute - 5) / 5);
+        }
+      }
+    }
 
     if (maxRankBrute) {
-      xpGained += Math.max(brute1.ranking - maxRankBrute.ranking, 0);
+      xpGained += Math.max(brute1.ranking - maxRankBrute.ranking - ratioDifference, 0);
     }
 
     if (xpGained > 10) {
@@ -167,7 +184,7 @@ export async function doFight(
   await prisma.log.create({
     data: {
       currentBrute: { connect: { id: brute1.id } },
-      type: generatedFight.winner === brute1.name ? "win" : "lose",
+      type: generatedFight.winner === brute1.name ? 'win' : 'lose',
       brute: brute2.name,
       fight: { connect: { id: fight.id } },
       xp: xpGained,
@@ -179,7 +196,7 @@ export async function doFight(
   await prisma.log.create({
     data: {
       currentBrute: { connect: { id: brute2.id } },
-      type: generatedFight.winner === brute2.name ? "survive" : "lose",
+      type: generatedFight.winner === brute2.name ? 'survive' : 'lose',
       brute: brute1.name,
       fight: { connect: { id: fight.id } },
     },

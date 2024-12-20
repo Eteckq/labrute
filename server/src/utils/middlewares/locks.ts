@@ -17,7 +17,7 @@ function deleteLock(key: string) {
 
 export default function lockMiddleware(req: Request, res: Response, next: NextFunction) {
   const { method, path } = req;
-
+  
   const { headers: { authorization } } = req;
 
   if (authorization) {
@@ -26,9 +26,9 @@ export default function lockMiddleware(req: Request, res: Response, next: NextFu
     if (!id || id === 'null') {
       return sendError(res, new ExpectedError('Invalid authorization header content'));
     }
-
+    
     const key = `${method}:${path.toLowerCase().replace(/\//g, '')}:${id}`;
-
+    console.log("key", key, key.length)
     if (locks[key]) {
       return sendError(res, new ExpectedError('Too many requests'));
     }
