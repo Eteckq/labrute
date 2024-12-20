@@ -28,7 +28,7 @@ export default function lockMiddleware(req: Request, res: Response, next: NextFu
     }
     
     const key = `${method}:${path.toLowerCase().replace(/\//g, '')}:${id}`;
-    console.log("key", key, key.length)
+    // console.log("key", key, key.length)
     if (locks[key]) {
       return sendError(res, new ExpectedError('Too many requests'));
     }
