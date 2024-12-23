@@ -144,18 +144,9 @@ export async function doFight(
     });
     let ratioDifference = 0;
     if (brute1.userId) {
-      const maxLevelBrute = await prisma.brute.findFirst({
-        where: {
-          userId: { not: brute1.userId },
-          deletedAt: null,
-        },
-        orderBy: { level: 'desc' },
-      });
-      if (maxLevelBrute) {
-        const differenceLevelWithMaxBrute = brute1.level - maxLevelBrute.level;
-        if (differenceLevelWithMaxBrute > 5) {
-          ratioDifference = Math.round((differenceLevelWithMaxBrute - 5) / 5);
-        }
+      const differenceLevelWithMaxBrute = brute1.level - 45;
+      if (differenceLevelWithMaxBrute > 0) {
+        ratioDifference = Math.round((differenceLevelWithMaxBrute) / 5);
       }
     }
 
