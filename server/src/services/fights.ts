@@ -144,7 +144,7 @@ export async function doFight(
     });
     let ratioDifference = 0;
     if (brute1.userId) {
-      const differenceLevelWithMaxBrute = brute1.level - 45;
+      const differenceLevelWithMaxBrute = brute1.level - 50;
       if (differenceLevelWithMaxBrute > 0) {
         ratioDifference = Math.round((differenceLevelWithMaxBrute) / 5);
       }
