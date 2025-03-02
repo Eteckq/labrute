@@ -134,10 +134,6 @@ export async function doFight(
       xpGained = LOSE_XP;
     }
 
-    if (!brute2.userId) {
-      xpGained -= 1;
-    }
-
     const maxRankBrute = await prisma.brute.findFirst({
       where: { user: { isNot: null }, deletedAt: null },
       orderBy: { ranking: 'asc' },
@@ -160,7 +156,7 @@ export async function doFight(
   }
 
   // Update brute XP and victories if arena fight
-  if (arenaFight) {
+  if (arenaFight && brute1.userId) {
     await prisma.brute.update({
       where: { id: brute1.id },
       data: {
@@ -168,6 +164,14 @@ export async function doFight(
         victories: { increment: generatedFight.winner === brute1.name ? 1 : 0 },
       },
       select: { id: true },
+    });
+    const gold = 10 - brute1.ranking + brute1.trophy * 2;
+
+    await prisma.user.update({
+      where: { id: brute1.userId },
+      data: {
+        gold: { increment: generatedFight.winner === brute1.name ? gold : gold / 2 },
+      },
     });
   }
 
