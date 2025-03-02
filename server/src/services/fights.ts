@@ -165,7 +165,7 @@ export async function doFight(
       },
       select: { id: true },
     });
-    const gold = 10 - brute1.ranking + brute1.trophy * 2;
+    const gold = Math.max(2, ((10 - brute1.ranking) * 2) + brute1.trophy * 2);
 
     await prisma.user.update({
       where: { id: brute1.userId },
