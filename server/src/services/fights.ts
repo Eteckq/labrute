@@ -170,7 +170,7 @@ export async function doFight(
     await prisma.user.update({
       where: { id: brute1.userId },
       data: {
-        gold: { increment: generatedFight.winner === brute1.name ? gold : gold / 2 },
+        gold: { increment: generatedFight.winner === brute1.name ? gold : Math.ceil(gold / 2) },
       },
     });
   }
