@@ -1,28 +1,30 @@
-import { pad } from '@labrute/core';
-import { Box, BoxProps, Link } from '@mui/material';
-import moment from 'moment';
-import React, { useEffect, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Link as RouterLink } from 'react-router-dom';
-import { useLanguage } from '../hooks/useLanguage';
-import Text from './Text';
-import { useAuth } from '../hooks/useAuth';
+import { pad } from "@labrute/core";
+import { Alert, Box, BoxProps, Link } from "@mui/material";
+import moment from "moment";
+import React, { useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { Link as RouterLink } from "react-router-dom";
+import { useLanguage } from "../hooks/useLanguage";
+import Text from "./Text";
+import { useAuth } from "../hooks/useAuth";
 
 export interface HeaderProps extends BoxProps {
   url?: string;
 }
 
-const Header = ({
-  ...rest
-}: HeaderProps) => {
+const Header = ({ ...rest }: HeaderProps) => {
   const { t } = useTranslation();
   const { language } = useLanguage();
   const [time, setTime] = React.useState(moment.utc());
   const { user } = useAuth();
-  const url = user && user.brutes.length > 0 ? `/${user?.brutes[0].name}/cell` : '/';
+  const url =
+    user && user.brutes.length > 0 ? `/${user?.brutes[0].name}/cell` : "/";
 
   // Randomized left art
-  const leftArt = useMemo(() => Math.floor(Math.random() * (11 - 1 + 1) + 1), []);
+  const leftArt = useMemo(
+    () => Math.floor(Math.random() * (11 - 1 + 1) + 1),
+    []
+  );
   // Randomized right art (must be different from left art)
   const rightArt = useMemo(() => {
     let art = Math.floor(Math.random() * (11 - 1 + 1) + 1);
@@ -43,20 +45,38 @@ const Header = ({
   return (
     <Box
       sx={{
-        position: 'relative',
+        position: "relative",
         zIndex: 2,
       }}
       {...rest}
     >
+      {/* Alerte de fermeture du serveur */}
+      <Alert
+        severity="warning"
+        sx={{
+          mb: 2,
+          textAlign: "center",
+          "& .MuiAlert-message": {
+            width: "100%",
+          },
+        }}
+      >
+        <Text bold>
+          ⚠️ Je ne paierais plus le serveur à partir du 13 décembre 2025, le jeu
+          ne sera plus accessible. Merci à tous d'avoir joué, et d'être resté
+          jusqu'ici :)
+        </Text>
+      </Alert>
+
       <Box
         component="img"
         src={`/images/header/left/${pad(leftArt, 2)}.png`}
         sx={{
-          position: 'absolute',
+          position: "absolute",
           top: 0,
           left: 0,
           zIndex: 1,
-          width: '23.118279569%',
+          width: "23.118279569%",
         }}
       />
       <Link component={RouterLink} to={url}>
@@ -70,15 +90,15 @@ const Header = ({
         component="img"
         src={`/images/header/right/1${pad(rightArt, 2)}.png`}
         sx={{
-          position: 'absolute',
+          position: "absolute",
           top: 0,
           right: 0,
           zIndex: 1,
-          width: '23.118279569%',
+          width: "23.118279569%",
         }}
       />
       <Text center bold color="secondary">
-        {t('serverTime')}: {time.format('HH:mm')}
+        {t("serverTime")}: {time.format("HH:mm")}
       </Text>
     </Box>
   );
